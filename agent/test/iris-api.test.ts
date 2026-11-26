@@ -63,4 +63,24 @@ describe("Iris staff app API", () => {
     expect(body).toContain("I can review the page title and headings.");
     expect(body).toContain("data: [DONE]");
   });
+
+  it("stays quiet when ElevenLabs sends its silence prompt, without a model call or a saved turn", async () => {
+    // ElevenLabs sends "..." as the caller's words after a few seconds of silence (measured 2026-11-26: every ~11 s).
+    const conversation = `voice-web:voice-visitor-${crypto.randomUUID()}`;
+    const stub = await installFake(conversation);
+    const userAuth = await signUserPass(key, "kestrel", "web:voice-visitor", expires());
+    for (const [index, said] of ["...", " … ", ". . ."].entries()) {
+      const messages = [{ role: "user", content: "Hello" }, { role: "assistant", content: "Hi." }, { role: "user", content: said }];
+      const response = await SELF.fetch("https://brain/v1/chat/completions", {
+        method: "POST", headers,
+        body: JSON.stringify({ model: "iris", stream: true, messages: messages.slice(index ? 2 : 0), elevenlabs_extra_body: { conversation_id: conversation, user_auth: userAuth } }),
+      });
+      expect(response.status).toBe(200);
+      const body = await response.text();
+      expect(body).toContain('"finish_reason":"stop"');
+      expect(body).toContain("data: [DONE]");
+      expect(body).not.toContain('"content"');
+    }
+    expect(await runInDurableObject(stub, (_instance, state) => state.storage.get<number>("test-model-calls"))).toBeUndefined();
+  });
 });

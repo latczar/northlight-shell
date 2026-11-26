@@ -31,6 +31,8 @@ export { SiteCopy } from "./site-copy";
 
 const MAX_TEXT = 8_000;
 const ID = /^[A-Za-z0-9_.:-]{1,128}$/;
+/** What ElevenLabs sends for a caller who has gone quiet: only dots or an ellipsis. */
+const SILENCE = /^[.…\s]+$/;
 
 /** Finds the client whose token matches, in constant time. */
 async function authenticate(request: Request, env: Env): Promise<ClientConfig | undefined> {
@@ -246,6 +248,16 @@ async function completions(request: Request, env: Env, client: ClientConfig): Pr
   const created = Math.floor(Date.now() / 1000);
   const chunk = (delta: Record<string, unknown>, finish: string | null = null) =>
     JSON.stringify({ id: completionId, object: "chat.completion.chunk", created, model: agentId, choices: [{ index: 0, delta, finish_reason: finish }] });
+
+  // ElevenLabs sends "..." as the caller's words after a few seconds of silence (measured 2026-11-26: every ~11 s while
+  // nobody spoke, 27 times in one call). Nobody said it: the reply is empty, and no model runs and no turn is saved.
+  if (SILENCE.test(text)) {
+    return sse(async send => {
+      send(chunk({ role: "assistant" }));
+      send(chunk({}, "stop"));
+      send("[DONE]");
+    }, request);
+  }
 
   // A client that takes calls only from approved numbers (src/phone.ts). Who is calling comes from the call's own record, saved
   // by phone-start, never from this request: whoever opens the ElevenLabs conversation can set its extra body. A conversation
