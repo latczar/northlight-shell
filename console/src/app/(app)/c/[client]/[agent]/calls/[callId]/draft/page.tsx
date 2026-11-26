@@ -12,6 +12,9 @@ import { requireAgent, requireViewer } from "@/lib/server/session";
 import { CreateCallDraft } from "../../CreateCallDraft";
 import { Progress } from "./Progress";
 import { RefreshReview } from "./RefreshReview";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Services draft" };
 
 export default async function ServicesDraft({ params }: {
   params: Promise<{ client: string; agent: string; callId: string }>;

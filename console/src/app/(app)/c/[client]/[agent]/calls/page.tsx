@@ -7,6 +7,9 @@ import { notFound } from "next/navigation";
 import { pilotCall, pilotCalls } from "@/lib/server/iris-calls.mjs";
 import { historyCaller } from "@/lib/server/pilot-call-access";
 import { requireAgent, requireViewer } from "@/lib/server/session";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Call history" };
 
 type Call = { id: string; time: number | null; turns: { who: string; text: string }[]; endedBy?: "iris" | "phone" };
 function searchText(text: string) {

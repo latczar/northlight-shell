@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { ring } from "@/components/ui/ring";
 import { requireViewer } from "@/lib/server/session";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Your businesses" };
 
 /** Home: straight to the person's team when they have one business; a choice when they have several. */
 export default async function Home() {
