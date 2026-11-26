@@ -2,7 +2,7 @@
 
 import { canApproveAgent, canSeeClient, canUseAgent } from "@/lib/access";
 import { canAskForRevision, canSeeRequest, decisionRight } from "@/lib/requests";
-import { BrainError, clearBrainCache, decideApproval, decideLesson, getApproval, listLessons, type Decision } from "@/lib/server/brain";
+import { BrainError, changeSiteCopy, clearBrainCache, decideApproval, decideLesson, getApproval, listLessons, type Decision } from "@/lib/server/brain";
 import { brainHasAccess, PeopleError } from "@/lib/server/people";
 import { actionViewer } from "@/lib/server/session";
 
@@ -58,6 +58,21 @@ export async function decideLessonAction(clientId: string, agentId: string, less
     const lesson = (await listLessons(clientId, agentId)).find(l => l.id === lessonId);
     if (!lesson || (lesson.agent !== null && lesson.agent !== agentId)) return { ok: false, error: "This lesson no longer exists. Refresh to see the current list." };
     const result = await decideLesson(clientId, lessonId, decision, viewer.userId);
+    return result.ok ? { ok: true } : { ok: false, error: result.message };
+  } catch (error) {
+    return { ok: false, error: error instanceof BrainError ? error.message : "Northlight's service failed. Try again." };
+  }
+}
+
+/** Publishes the website's approved changes from Preview to Live, or discards them. Admins and approvers of the employee only. */
+export async function siteCopyAction(clientId: string, agentId: string, action: "publish" | "discard"): Promise<ActionResult> {
+  const viewer = await actionViewer();
+  if ("error" in viewer) return { ok: false, error: viewer.error };
+  if (agentId !== "iris" || !canSeeClient(viewer.access, viewer.clients, clientId) || !canUseAgent(viewer.access, clientId, agentId)) return { ok: false, error: "This employee does not look after a website here." };
+  if (!viewer.admin && !canApproveAgent(viewer.access, clientId, agentId)) return { ok: false, error: "Only people who approve this employee's requests can publish or discard website changes." };
+  if (action !== "publish" && action !== "discard") return { ok: false, error: "That is not something this app can do to the website." };
+  try {
+    const result = await changeSiteCopy(clientId, action, viewer.userId, viewer.admin);
     return result.ok ? { ok: true } : { ok: false, error: result.message };
   } catch (error) {
     return { ok: false, error: error instanceof BrainError ? error.message : "Northlight's service failed. Try again." };

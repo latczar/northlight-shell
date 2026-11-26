@@ -65,7 +65,7 @@ export default async function DeskPage({ params, searchParams }: { params: Promi
       initialTab={initialTab}
       initialChat={query.chat === "1"}
       panels={{
-        overview: <Overview agent={agent} clientId={client.id} decisions={decisions} data={desk.data} work={desk.work} />,
+        overview: <Overview agent={agent} clientId={client.id} decisions={decisions} data={desk.data} work={desk.work} site={client.site} canPublish={viewer.admin || canDecideLessons} />,
         requests: <RequestsPanel pending={desk.pending} decided={desk.decided} clientId={client.id} agentName={agent.name} who={viewer} names={desk.names} />,
         setup: <SetupPanel setup={desk.setup} agentName={agent.name} admin={viewer.admin} />,
         learned: <LearnedPanel lessons={desk.lessons} clientId={client.id} agentId={agent.id} agentName={agent.name} canDecide={canDecideLessons} />,

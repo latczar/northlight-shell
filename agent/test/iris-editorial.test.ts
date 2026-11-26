@@ -150,6 +150,8 @@ describe("Iris editorial workflow", () => {
           return { content: next ? "" : "Finished.", toolCalls, usage: { inputTokens: 1, outputTokens: 1 } };
         } } };
       const previous = JSON.parse(await dashboard.snapshots("iris")).snapshots.approved_seo_copy;
+      const siteCopy = async () => JSON.parse(await dashboard.snapshots("iris")).snapshots.site_copy?.data;
+      const siteBefore = await siteCopy();
       await runTurn(deps, { id: "first", text: "Run iris-weekly-homepage" });
       expect(await dashboard.hasReportFromConversation(conversationId)).toBe(mode !== "visitor");
       const saved = async () => JSON.parse(await dashboard.snapshots("iris")).snapshots.approved_seo_copy;
@@ -160,6 +162,9 @@ describe("Iris editorial workflow", () => {
       await decideAction(deps, ids[1], yes, "");
       if (yes) expect((await saved()).data).toMatchObject({ current: page.title, status: "approved_for_implementation" });
       else expect(await saved()).toEqual(previous);
+      // approved wording waits in the site's Preview; nothing goes Live until someone publishes
+      if (yes) expect(await siteCopy()).toMatchObject({ live: siteBefore?.live ?? {}, pending: { "/": { title: { text: "Auto Repair in Milbrook", replaces: page.title } } } });
+      else expect(await siteCopy()).toEqual(siteBefore);
     });
   });
 });

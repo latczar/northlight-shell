@@ -442,3 +442,30 @@ test("a saved draft returns staff to the exact source even outside the first His
     }
   } finally { await ios.close(); }
 });
+
+test("approved copy waits on Preview until someone publishes it", async ({ page }) => {
+  await signIn(page, "alex@kestrel.example", "alex-test-pass");
+  await page.goto("/c/kestrel/iris?chat=1");
+  const box = page.getByRole("textbox", { name: /message to/i });
+  await box.fill("Please suggest a better homepage description.");
+  const started = page.waitForResponse(r => r.url().endsWith("/jobs") && r.request().method() === "POST");
+  await box.press("Enter");
+  const job = (await started).request().postDataJSON().id as string;
+  const request = page.locator("#request-act-" + job);
+  await expect(async () => {
+    await page.goto(desk);
+    await expect(request).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 12_000 });
+  await expect(request.getByText(/Approving puts this wording on the website’s Preview/)).toBeVisible();
+  await request.getByRole("button", { name: "Approve this copy" }).click();
+  await expect(request.getByText("Done", { exact: true })).toBeVisible();
+
+  await page.goto("/c/kestrel/iris");
+  await expect(page.getByText(/approved changes? (is|are) on Preview, not live yet/)).toBeVisible();
+  await expect(page.getByRole("tabpanel", { name: "Overview" }).getByText("Sample proposed description: Auto repair you can trust in Milbrook. Call us for a free quote.")).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Preview/ })).toHaveAttribute("href", "https://kestrel-garage.example/?preview=1");
+  await expect(page.getByRole("link", { name: /^Live site/ })).toHaveAttribute("href", "https://kestrel-garage.example/?preview=0");
+  await page.getByRole("button", { name: "Publish to live" }).click();
+  await expect(page.getByText(/^Nothing waiting\./)).toBeVisible();
+  await expect(page.getByText(/^Published just now$/)).toBeVisible();
+});

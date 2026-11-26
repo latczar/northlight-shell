@@ -1,6 +1,7 @@
 import { staffDesk } from './src/iris-staff.mjs';
 import site from './site.json' with { type: 'json' };
 import { serveVideo } from './src/video.mjs';
+import { withSiteCopy } from './src/live-copy.mjs';
 
 export default {
   fetch(request, env) {
@@ -13,6 +14,7 @@ export default {
     // An optional hero video is served with byte ranges for mobile browsers.
     const hero = site.home.hero_video;
     if (hero && [hero.video, hero.mobile_video].includes(path)) return serveVideo(request, env.ASSETS);
-    return env.ASSETS.fetch(request);
+    // Pages get the Live or Preview copy staff approved in Northlight (src/live-copy.mjs).
+    return withSiteCopy(request, env, page => env.ASSETS.fetch(page));
   },
 };

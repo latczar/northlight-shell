@@ -378,6 +378,13 @@ async function approvalRoute(req, res, client, state, id) {
   if (record.status === "pending") {
     Object.assign(record, { status: approve ? "done" : "declined", decidedBy, reason, decidedAt: Date.now() });
     if (approve) record.result = { ...record.preview, status: "approved_for_implementation" };
+    // approved wording waits on the site's Preview until someone publishes it (agent src/site-copy.ts)
+    if (approve && record.tool === "submit_seo_copy" && typeof record.preview?.url === "string") {
+      const site = state.snapshots.site_copy?.data ?? { live: {}, pending: {} };
+      const path = new URL(record.preview.url).pathname.replace(/\/+$/, "") || "/";
+      site.pending[path] = { ...site.pending[path], [record.preview.field]: { text: record.preview.proposed, replaces: record.preview.current ?? "", approvedAt: Date.now() } };
+      state.snapshots.site_copy = { at: Date.now(), data: site };
+    }
     const card = approvalCard(state, id);
     if (card) Object.assign(card, { kind: "status", title: `${approve ? "Done" : "Declined"}: ${record.title}`.slice(0, 120), updatedAt: Date.now() });
     WAITERS.get(`${client.id}/${id}`)?.(approve ? "approved" : "declined");
@@ -546,6 +553,20 @@ async function brain(req, res, url) {
   }
   const lesson = /^\/v1\/lessons\/([A-Za-z0-9_.:-]{1,128})$/.exec(path);
   if (req.method === "POST" && lesson) return lessonDecision(req, res, client, state, lesson[1]);
+
+  // Publish the website's waiting changes to Live, or discard them (agent src/index.ts): an admin or an approver pass.
+  if (req.method === "POST" && path === "/v1/agents/iris/site") {
+    const h = req.headers;
+    const person = h["x-admin-pass"] !== undefined ? verifyPass(client.approverKey, client.id, h["x-admin-pass"], "admin") : verifyPass(client.approverKey, client.id, h["x-approver-pass"] ?? "", "approve");
+    if (!person) return json(res, 401, { error: "A valid approver pass is required." });
+    const body = await readJson(req);
+    if (body?.action !== "publish" && body?.action !== "discard") return json(res, 400, { error: 'action must be "publish" or "discard"' });
+    const site = state.snapshots.site_copy?.data ?? { live: {}, pending: {} };
+    const next = body.action === "discard" ? { ...site, pending: {} } : { live: structuredClone(site.live), pending: {}, publishedAt: Date.now(), publishedBy: person };
+    if (body.action === "publish") for (const [page, fields] of Object.entries(site.pending)) for (const [field, change] of Object.entries(fields)) next.live[page] = { ...next.live[page], [field]: change.text };
+    state.snapshots.site_copy = { at: Date.now(), data: next };
+    return json(res, 200, next);
+  }
 
   const panel = PANEL.exec(path);
   if (panel) {

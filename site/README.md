@@ -54,6 +54,19 @@ The Worker reaches the agent through the `AGENT` service binding to the `northli
 
 Set secrets with `npx wrangler secret put <NAME>`. Never commit them; `.dev.vars` is ignored.
 
+## Live and Preview
+
+Page titles and meta descriptions that staff approve in the Northlight console reach this site without a rebuild:
+
+- **Preview:** an approved change shows first on Preview. Open any page with `?preview=1` to see it (a cookie keeps
+  Preview on while you browse, with a teal bar at the top); `?preview=0` goes back to the live site.
+- **Live:** pressing **Publish to live** on Iris's Overview in the console makes every waiting change live at once.
+  **Discard changes** drops them instead.
+
+The Worker asks the agent for the copy through the `SITE_COPY` service binding (`src/live-copy.mjs`) and swaps it into
+each page as it is served. If the agent cannot answer, the built page is served unchanged. `site.json` stays the
+starting copy.
+
 ## Deploy
 
 ```powershell

@@ -20,6 +20,7 @@ import { localTime, SLACK_USER, slackEvents, slackInteractions } from "./slack";
 import { verifyUserPass } from "./user-auth";
 import { TOOLS } from "../tools";
 import { may } from "./lesson-access";
+import { changeSiteCopy, SITE_COPY_AGENT } from "./site-copy";
 
 export { Conversation };
 export { Dashboard } from "./dashboard";
@@ -28,6 +29,7 @@ export { Memory } from "./memory";
 export { Scheduler } from "./scheduler";
 export { Leads } from "./leads";
 export { Usage } from "./usage";
+export { SiteCopy } from "./site-copy";
 
 const MAX_TEXT = 8_000;
 const ID = /^[A-Za-z0-9_.:-]{1,128}$/;
@@ -647,6 +649,21 @@ export default {
       } catch (error) {
         return json({ error: error instanceof Error ? error.message : "Preview build failed." }, 422);
       }
+    }
+    // The website's approved changes waiting in Preview: publish them to Live, or drop them (src/site-copy.ts).
+    // An admin pass, or the approver pass of someone who approves for Iris.
+    if (request.method === "POST" && url.pathname === "/v1/agents/iris/site") {
+      if (!client.agents.includes(SITE_COPY_AGENT)) return json({ error: "Not found" }, 404);
+      const adminPerson = client.accessSigningEnv && request.headers.has("x-admin-pass") ? await admin(request, env, client) : undefined;
+      if (adminPerson instanceof Response) return adminPerson;
+      const person = adminPerson ?? await approver(request, env, client);
+      if (person instanceof Response) return person;
+      if (adminPerson === undefined && !await may(env, client, "approve", person, SITE_COPY_AGENT)) {
+        return json({ error: "Only people who approve Iris's requests can publish or discard website changes." }, 403);
+      }
+      const body = await request.json().catch(() => null) as { action?: unknown } | null;
+      if (body?.action !== "publish" && body?.action !== "discard") return json({ error: 'action must be "publish" or "discard"' }, 400);
+      return json(await changeSiteCopy(env, client.id, body.action, person));
     }
     if (request.method === "POST" && url.pathname === "/v1/chat/completions") return completions(request, env, client);
     if (request.method === "POST" && url.pathname === "/v1/voice/phone-start") return phoneStart(request, env, client, ctx);

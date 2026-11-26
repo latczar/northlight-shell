@@ -6,15 +6,21 @@
   "compatibility_date": "2026-10-01",
   "workers_dev": true,
   "preview_urls": false,
-  // The staff desk calls the Northlight agent Worker through this service binding.
-  "services": [{"binding": "AGENT", "service": "northlight-agent"}],
+  // The staff desk calls the Northlight agent Worker through AGENT. SITE_COPY gives every page its Live or Preview
+  // title and description (src/live-copy.mjs); NORTHLIGHT_CLIENT names this site's business in Northlight.
+  "services": [
+    {"binding": "AGENT", "service": "northlight-agent"},
+    {"binding": "SITE_COPY", "service": "northlight-agent", "entrypoint": "SiteCopy"}
+  ],
+  "vars": {"NORTHLIGHT_CLIENT": "kestrel"},
   // Not secret. Set IRIS_STAFF_EMAIL, IRIS_STAFF_PERSON, IRIS_ACCESS_ISSUER and IRIS_ACCESS_AUD as vars or secrets
   // once Cloudflare Access protects /staff/iris. Secrets: CLIENT_TOKEN_KESTREL, USER_SIGNING_KEY_KESTREL,
   // APPROVER_SIGNING_KEY_KESTREL. Optional phone line: IRIS_CALL_HISTORY_KEY, IRIS_VOICE_AGENT_ID,
   // IRIS_VOICE_BRANCH_ID, IRIS_PHONE_NUMBER, IRIS_PHONE_DISPLAY and IRIS_STAFF_HANDSET.
   "assets": {
     "binding": "ASSETS",
-    "run_worker_first": ["/video/*", "/staff/iris", "/staff/iris/*"],
+    // Every request runs the Worker first, so pages can carry their Live or Preview copy.
+    "run_worker_first": true,
     "directory": "./public",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"

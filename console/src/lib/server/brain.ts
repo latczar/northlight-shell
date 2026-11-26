@@ -184,6 +184,24 @@ export async function decideLesson(clientId: string, lessonId: string, decision:
   return { ok: false, ...(DECISION_MESSAGES[response.status] ?? { status: 502, message: `Northlight's service could not record your decision (HTTP ${response.status}). Try again.` }) };
 }
 
+export type SiteCopyResult = { ok: true } | { ok: false; message: string };
+
+/** Publishes the website's waiting changes to Live, or drops them, as `personId` (an approver of Iris, or an admin). */
+export async function changeSiteCopy(clientId: string, action: "publish" | "discard", personId: string, admin: boolean): Promise<SiteCopyResult> {
+  const creds = credentials(clientId);
+  const pass = signPass(creds.approverKey, clientId, personId, Math.floor(Date.now() / 1000) + APPROVER_PASS_SECONDS, admin ? "admin" : "approve");
+  const response = await call(creds, agentPath("iris", "site"), {
+    method: "POST",
+    headers: { "content-type": "application/json", [admin ? "x-admin-pass" : "x-approver-pass"]: pass },
+    body: JSON.stringify({ action }),
+  });
+  clearBrainCache(clientId);
+  if (response.ok) return { ok: true };
+  const body = await response.json().catch(() => null) as { error?: unknown } | null;
+  if (response.status === 403 && typeof body?.error === "string") return { ok: false, message: body.error };
+  return { ok: false, message: `Northlight's service could not ${action} the changes (HTTP ${response.status}). Try again.` };
+}
+
 const conversationPath = (agentId: string, personId: string, rest: string) => agentPath(agentId, `conversations/web-${encodeURIComponent(personId)}/${rest}`);
 const userPass = (creds: BrainCredentials, clientId: string, personId: string) =>
   signPass(creds.userKey, clientId, personId, Math.floor(Date.now() / 1000) + USER_PASS_SECONDS);

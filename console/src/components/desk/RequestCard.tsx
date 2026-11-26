@@ -114,7 +114,7 @@ export function RequestCard({
       )}
 
       {draft && request.status === "pending" && (
-        <p className="text-small text-pretty text-ink-2">Approval saves this wording. Publishing is a separate step.</p>
+        <p className="text-small text-pretty text-ink-2">Approving puts this wording on the website’s Preview. Publish it from the Overview to make it live.</p>
       )}
 
       {error && <Notice tone="danger">{error}</Notice>}

@@ -2,6 +2,7 @@ import type { JsonObject, ToolContext, ToolDefinition } from "../../src/contract
 import { reviewedText } from "./page-text";
 import { postCard } from "../../src/tools";
 import { ToolError } from "../../src/errors";
+import { addPending, SITE_COPY_KIND } from "../../src/site-copy";
 
 async function mayReview(context: ToolContext) {
   return context.agentId === "iris" &&
@@ -37,7 +38,7 @@ function draft(context: ToolContext, args: JsonObject) {
 
 export const reviewCopy: ToolDefinition = {
   name: "submit_seo_copy", label: "Submitting SEO copy for review",
-  description: "Submit a page title or meta description for staff editorial approval. Cite the successful review_site_page action. Approval records the wording for implementation.",
+  description: "Submit a page title or meta description for staff editorial approval. Cite the successful review_site_page action. Approval puts the wording on the preview site; staff publish it to make it live.",
   permission: "website.copy.review", effect: "write", notOnCalls: true, parallelSafe: false, timeoutMs: 5000,
   parameters: { type: "object", additionalProperties: false, required: ["pageActionId", "field", "proposed", "reason"],
     properties: { pageActionId: { type: "string", maxLength: 128 }, field: { type: "string", enum: ["title", "description"] },
@@ -55,12 +56,13 @@ export const reviewCopy: ToolDefinition = {
         throw new ToolError("Mention " + location + " only once in the revised copy. Rephrase and submit again.", true);
       }
     }
-    return { title: "Review page " + preview.field, summary: preview.reason + " Approval records this copy for implementation.", preview };
+    return { title: "Review page " + preview.field, summary: preview.reason + " Approval puts this copy on the preview site; publish it to make it live.", preview };
   },
   async execute(context, args) {
     return { data: { ...draft(context, args), status: "approved_for_implementation" } };
   },
-  snapshots: [{ kind: "approved_seo_copy" }],
+  // the last approved draft, and the site's Live and Preview copy (src/site-copy.ts)
+  snapshots: [{ kind: "approved_seo_copy" }, { kind: SITE_COPY_KIND, merge: (previous, data) => addPending(previous, data) }],
 };
 
 export const postReview: ToolDefinition = {

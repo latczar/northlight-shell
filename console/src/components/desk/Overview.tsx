@@ -10,12 +10,13 @@ import { formatAgo, formatFull } from "@/lib/format";
 import { httpUrl } from "@/lib/preview";
 import type { Part } from "@/lib/server/workspace";
 import { TabButton } from "./Desk";
+import { WebsitePanel, type WebsiteChange } from "./WebsitePanel";
 
 /*
  The Overview: what waits on the person, what the employee last saw (the data its tools saved, for the kinds this app
  knows how to show), then its latest work. Saved data says when it was saved, because it can be old.
 */
-export function Overview({ agent, clientId, decisions, data, work }: { agent: AgentSummary; clientId: string; decisions: number; data: Part<AgentData>; work: Part<Card[]> }) {
+export function Overview({ agent, clientId, decisions, data, work, site, canPublish }: { agent: AgentSummary; clientId: string; decisions: number; data: Part<AgentData>; work: Part<Card[]>; site?: string; canPublish: boolean }) {
   const snapshots = data.ok ? data.value.snapshots : {};
   return (
     <div className="flex flex-col gap-10">
@@ -26,7 +27,14 @@ export function Overview({ agent, clientId, decisions, data, work }: { agent: Ag
       )}
       {!data.ok && <LoadFailed title={`What ${agent.name} saved could not be loaded`} reason={data.error} />}
       {snapshots.homepage_seo && <PageCheck at={snapshots.homepage_seo.at} data={snapshots.homepage_seo.data} />}
-      {snapshots.approved_seo_copy && <ApprovedCopy at={snapshots.approved_seo_copy.at} data={snapshots.approved_seo_copy.data} />}
+      {agent.id === "iris" && site && data.ok && (
+        <Section
+          title="Website"
+          meta={snapshots.site_copy && (snapshots.site_copy.data as { publishedAt?: number })?.publishedAt ? <Saved verb="Published" at={(snapshots.site_copy.data as { publishedAt: number }).publishedAt} /> : undefined}
+        >
+          <WebsitePanel clientId={clientId} agentId={agent.id} site={site} changes={websiteChanges(snapshots.site_copy?.data)} canPublish={canPublish} />
+        </Section>
+      )}
       <Section title="Latest work">
         {!work.ok ? (
           <LoadFailed title="Recent work could not be loaded" reason={work.error} />
@@ -101,26 +109,12 @@ function PageCheck({ at, data }: { at: number; data: unknown }) {
   );
 }
 
-/** The last copy a person approved for implementation (submit_seo_copy's saved result). */
-function ApprovedCopy({ at, data }: { at: number; data: unknown }) {
-  const d = (data ?? {}) as Record<string, unknown>;
-  const field = d.field === "title" ? "Page title" : d.field === "description" ? "Meta description" : "Copy";
-  return (
-    <Section title="Last approved copy" meta={<Saved verb="Approved" at={at} />}>
-      <div className={`flex flex-col gap-3 ${card}`}>
-        <KeyValue>
-          <KeyValueRow label="Field">{field}</KeyValueRow>
-          <KeyValueRow label="Approved wording">
-            <Wording text={str(d.proposed)} />
-          </KeyValueRow>
-          {str(d.current) && (
-            <KeyValueRow label="Wording it replaces">
-              <Wording text={str(d.current)} />
-            </KeyValueRow>
-          )}
-        </KeyValue>
-        <p className="text-small text-ink-2">Approval records the wording for the website team to put live; the page itself is unchanged until they do.</p>
-      </div>
-    </Section>
-  );
+/** The website's waiting changes (the site_copy snapshot: Live, and approved changes on Preview), newest first. */
+function websiteChanges(data: unknown): WebsiteChange[] {
+  const pending = ((data ?? {}) as { pending?: Record<string, Record<string, { text?: unknown; replaces?: unknown; approvedAt?: unknown }>> }).pending ?? {};
+  return Object.entries(pending)
+    .flatMap(([path, fields]) => Object.entries(fields ?? {}).map(([field, change]) => ({ path, field, text: str(change?.text), replaces: str(change?.replaces), at: Number(change?.approvedAt) || 0 })))
+    .filter(change => change.text && (change.field === "title" || change.field === "description"))
+    .sort((a, b) => b.at - a.at)
+    .map(({ path, field, text, replaces }) => ({ path, field, text, replaces }));
 }
