@@ -3,7 +3,18 @@
     "seo.read",
     "website.copy.review"
   ],
-  "schedules": [],
+  "schedules": [
+    {
+      "id": "iris-weekly-homepage",
+      "agent": "iris",
+      "days": [
+        1
+      ],
+      "time": "08:00",
+      "timezone": "Europe/London",
+      "task": "Review the live website's main pages with review_site_page: the homepage (/), /services/, /about/ and /contact/. Check each page's title and meta description for accuracy, the services and location the page supports, and length. For the clearest improvement, submit up to two evidence-backed proposals using submit_seo_copy, each citing that page's action ID; skip a page whose wording is already suitable and never repeat wording that is already live. Record what you checked and recommend using post_seo_report with the page action IDs. Never publish: approved changes go to the website's Preview and staff publish them from the console."
+    }
+  ],
   "settings": {
     "servicesPagePath": "/services/",
     "designNotes": "The owner approved the current homepage heading. Preserve it during routine SEO work. Ask staff before proposing a different heading.",
@@ -46,18 +57,6 @@
           "path": "/pagespeedonline/v5/runPagespeed"
         }
       ]
-    }
-  ],
-  "pausedSchedules": [
-    {
-      "id": "iris-weekly-homepage",
-      "agent": "iris",
-      "days": [
-        1
-      ],
-      "time": "08:00",
-      "timezone": "Europe/London",
-      "task": "Inspect the live homepage with review_site_page. If a title or meta description change is warranted, submit one evidence-backed proposal using submit_seo_copy. Record the observed page and recommendation using post_seo_report with the page action ID. Never publish or open a pull request."
     }
   ]
 }
