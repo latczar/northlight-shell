@@ -1,0 +1,38 @@
+{
+  "slug": "get-your-tyres-ready-for-winter",
+  "status": "published",
+  "date": "2026-10-21",
+  "category": "Tyres",
+  "title": "Get your tyres ready for winter",
+  "summary": "Colder, wetter roads ask more of your tyres. Check tread, pressure and condition before the weather turns.",
+  "image": "kestrel-tyres.svg",
+  "image_alt": "Illustration of a tyre and wheel",
+  "author": "The Kestrel Garage team",
+  "body": [
+    {
+      "p": "Grip matters most when the roads are cold and wet. A quick check now can save a puncture on a dark evening."
+    },
+    {
+      "h2": "Tread depth"
+    },
+    {
+      "p": "The legal minimum for cars is 1.6mm across the central three quarters of the tread, all the way round. Many drivers choose to replace tyres well before that point."
+    },
+    {
+      "h2": "Pressures and condition"
+    },
+    {
+      "ul": [
+        "Check pressures when the tyres are cold, using the figures in your handbook or door pillar.",
+        "Look for cuts, cracks and bulges in the sidewalls.",
+        "Do not forget the spare if your car has one."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "label": "GOV.UK: The Highway Code",
+      "url": "https://www.gov.uk/guidance/the-highway-code"
+    }
+  ]
+}

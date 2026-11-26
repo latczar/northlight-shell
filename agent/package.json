@@ -1,0 +1,30 @@
+{
+  "name": "northlight-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "test:watch": "vitest",
+    "check:build": "wrangler deploy --dry-run --outdir .wrangler/check/brain && wrangler deploy --dry-run --config desk/wrangler.jsonc --outdir .wrangler/check/desk",
+    "check": "npm run typecheck && npm test && npm run check:build"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.5.1",
+    "@cloudflare/workers-types": "^5.20261103.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0",
+    "wrangler": "^4.157.0"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.4",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "entities": "9.0.0"
+  }
+}

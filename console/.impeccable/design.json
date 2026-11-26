@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-24T09:00:00Z",
+  "title": "Design System: Northlight client app",
+  "extensions": {
+    "colorMeta": {
+      "teal-ink": {
+        "role": "primary",
+        "displayName": "Teal ink (accent on light)",
+        "canonical": "#0f766e",
+        "tonalRamp": [
+          "#061817",
+          "#093430",
+          "#0c504a",
+          "#0e6b64",
+          "#489791",
+          "#80b8b4",
+          "#b9dad7",
+          "#e0f0ef"
+        ]
+      },
+      "bright-teal": {
+        "role": "primary",
+        "displayName": "Bright teal (dark theme accent)",
+        "canonical": "#2dd4bf",
+        "tonalRamp": [
+          "#0b2723",
+          "#155a51",
+          "#1f8d7f",
+          "#29c0ad",
+          "#5edece",
+          "#90e8dc",
+          "#c1f1eb",
+          "#e2f8f5"
+        ]
+      },
+      "teal": {
+        "role": "primary",
+        "displayName": "Teal (the north star mark)",
+        "canonical": "#14b8a6",
+        "tonalRamp": [
+          "#07221f",
+          "#0b4e47",
+          "#0f7a6e",
+          "#12a696",
+          "#4cc9bb",
+          "#83dad0",
+          "#baeae5",
+          "#e0f6f3"
+        ]
+      },
+      "charcoal": {
+        "role": "neutral",
+        "displayName": "Charcoal",
+        "canonical": "#16191d",
+        "tonalRamp": [
+          "#0b0d0f",
+          "#16191d",
+          "#1f2328",
+          "#2c3138",
+          "#4a545d",
+          "#7d878f",
+          "#c3cad0",
+          "#e8ecef"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink (cool neutral scale)",
+        "tonalRamp": [
+          "#1f2328",
+          "#2c3138",
+          "#3b434b",
+          "#4a545d",
+          "#5b6670",
+          "#7d878f",
+          "#c3cad0",
+          "#f6f8f8"
+        ]
+      },
+      "ok": {
+        "role": "tertiary",
+        "displayName": "Success",
+        "canonical": "oklch(51.4% 0.110 160.0)",
+        "tonalRamp": [
+          "#000f07",
+          "#002e1b",
+          "#004f32",
+          "#06744b",
+          "#3b966b",
+          "#61ba8d",
+          "#86dfb1",
+          "#c3ffdd"
+        ]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Attention",
+        "canonical": "oklch(49.5% 0.105 73.7)",
+        "tonalRamp": [
+          "#130900",
+          "#352001",
+          "#5b3a02",
+          "#845704",
+          "#a87831",
+          "#cd9b56",
+          "#f2bf7a",
+          "#ffebd2"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Error",
+        "canonical": "oklch(52.6% 0.160 24.5)",
+        "tonalRamp": [
+          "#1f0001",
+          "#4d0007",
+          "#800112",
+          "#a92e30",
+          "#d15350",
+          "#f97771",
+          "#ffb2ac",
+          "#ffe9e6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "One page title per page."
+      },
+      "heading": {
+        "displayName": "Heading",
+        "purpose": "Sections and dialogs."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "An item's name: a request, a piece of work, a lesson."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose and every form field."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Values, hints, buttons and tabs."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Keys and table heads; Meta (same size, tabular) for times and counts."
+      },
+      "mono": {
+        "displayName": "Geist Mono",
+        "purpose": "Literal strings only: addresses, character counts, codes."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Every state change (150 ms) and arriving block (200 ms)."
+      },
+      {
+        "name": "star-twinkle",
+        "value": "a 0.4 s dip to 80% size and 75% opacity every 7 s",
+        "purpose": "The brand's signature move, on the north star only. Still under reduced motion."
+      },
+      {
+        "name": "orbit-drift",
+        "value": "52 to 95 s per turn, linear",
+        "purpose": "The orbit's nodes drifting. Still under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action in a view: approve, add a person, sign in.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>Approve this copy</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border: 1px solid transparent; border-radius: 9999px; background: var(--color-accent, #0f766e); color: var(--color-on-accent, #fff); font: 600 14px/20px Inter, 'Helvetica Neue', Arial, sans-serif; cursor: pointer; transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background: var(--color-accent-hover, #0d625b); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-focus, #0f766e); outline-offset: 2px; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Every other action: decline, change, chat with an employee.",
+      "html": "<button class=\"ds-btn-secondary\">Decline</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border: 1px solid var(--color-rule-strong, #7d878f); border-radius: 9999px; background: transparent; color: var(--color-ink, #1f2328); font: 600 14px/20px Inter, 'Helvetica Neue', Arial, sans-serif; cursor: pointer; transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-secondary:hover { background: rgb(31 35 40 / 0.05); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-focus, #0f766e); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A labelled field; errors in words below it.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Email</span><input class=\"ds-input\" type=\"email\" placeholder=\"you@business.com\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; } .ds-field-label { font: 500 12px/16px Inter, Arial, sans-serif; color: var(--color-ink-2, #4a545d); } .ds-input { height: 40px; padding: 0 12px; border: 1px solid var(--color-rule-strong, #7d878f); border-radius: 4px; background: var(--color-inset, #f6f8f8); color: var(--color-ink, #1f2328); font: 400 16px/24px Inter, Arial, sans-serif; } .ds-input:focus-visible { border-color: var(--color-focus, #0f766e); outline: 2px solid var(--color-focus, #0f766e); outline-offset: 0; }"
+    },
+    {
+      "name": "Status",
+      "kind": "chip",
+      "description": "A dot plus a word: the only way state is shown.",
+      "html": "<span class=\"ds-status\"><span class=\"ds-dot\"></span>Needs you</span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/16px Inter, Arial, sans-serif; color: var(--color-ink-2, #4a545d); } .ds-dot { width: 8px; height: 8px; border-radius: 9999px; background: var(--color-warn-dot, #e0a73a); }"
+    },
+    {
+      "name": "Work Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "One list in one card, a rule between rows: what an employee did.",
+      "html": "<ol class=\"ds-card\"><li class=\"ds-row\"><span class=\"ds-meta\"><span class=\"ds-dot-ok\"></span>Done</span><p class=\"ds-title\">Review page title</p><p class=\"ds-summary\">Uses the full business name. Approval records this copy for implementation.</p></li></ol>",
+      "css": ".ds-card { list-style: none; margin: 0; padding: 0; border: 1px solid var(--color-rule, #dde3e6); border-radius: 8px; background: var(--color-card, #fff); font-family: Inter, Arial, sans-serif; } .ds-row { padding: 12px 20px; } .ds-meta { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/16px Inter, Arial, sans-serif; color: var(--color-ink-2, #4a545d); } .ds-dot-ok { width: 8px; height: 8px; border-radius: 9999px; background: var(--color-ok-dot, #1f9d6b); } .ds-title { margin: 4px 0 0; font: 600 16px/24px Inter, Arial, sans-serif; color: var(--color-ink, #1f2328); } .ds-summary { margin: 2px 0 0; font: 400 14px/20px Inter, Arial, sans-serif; color: var(--color-ink-2, #4a545d); }"
+    },
+    {
+      "name": "Top Bar",
+      "kind": "nav",
+      "refersTo": "top-bar",
+      "description": "Charcoal in both themes: the lockup, the business, the sections.",
+      "html": "<nav class=\"ds-bar\"><span class=\"ds-brand\">Northlight</span><a class=\"ds-link\" href=\"#\">Kestrel Garage</a><a class=\"ds-link ds-current\" href=\"#\" aria-current=\"page\">Team</a></nav>",
+      "css": ".ds-bar { display: flex; align-items: center; gap: 24px; height: 64px; padding: 0 24px; background: var(--color-bar, #16191d); font-family: Inter, Arial, sans-serif; } .ds-brand { color: #fff; font: 700 20px/1 Manrope, Arial, sans-serif; letter-spacing: -0.02em; } .ds-link { color: var(--color-bar-ink-2, #c3cad0); font: 500 14px/20px Inter, Arial, sans-serif; text-decoration: none; padding: 6px 0; border-bottom: 2px solid transparent; } .ds-link:hover { color: #fff; } .ds-current { color: #2dd4bf; border-bottom-color: #2dd4bf; } .ds-link:focus-visible { outline: 2px solid #2dd4bf; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The quiet control room",
+    "overview": "A calm, light workspace under a charcoal bar, where the one bright thing is what needs you. The Northlight mark, a four-point north star, sits at the centre of the team page: the business is the ring, its AI employees sit on the orbit, and the star twinkles now and then. Everything else is paper-quiet: cool neutrals, one accent, status as a dot plus a word.\n\nDark mode is charcoal, not light inverted: a charcoal ground, elevation by surface colour, bright teal as the accent with charcoal type on it.",
+    "keyCharacteristics": [
+      "One accent per theme: teal ink on light, bright teal on dark. The only full teal on a light screen is the north star.",
+      "Charcoal appears in the top bar, the avatars and the sign-in cover only.",
+      "No shadows, no glass, no gradients: elevation is surface colour.",
+      "Words carry state; colour only repeats it."
+    ],
+    "rules": [
+      {
+        "name": "The One Star Rule",
+        "body": "On a light screen the only full teal is the north star; everything interactive uses the darker teal ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dot-and-Word Rule",
+        "body": "Every status is a coloured dot plus a word (\"Needs you\", \"Done\", \"Problem\"); colour is never the only signal. Dots use the design's state colours; their words use the darker text variants (ok #157a51, warn #855700, danger #b53939).",
+        "section": "colors"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Labels, buttons and headings are sentence case; no eyebrow or kicker labels above headings.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do say what approving does and what it does not.",
+      "Do show load failures as failures with Try again, never as an empty list.",
+      "Do keep every count next to words that say what it counts."
+    ],
+    "donts": [
+      "Don't use shadows, glass, glow or gradient text.",
+      "Don't put full teal on a light surface outside the north star.",
+      "Don't call an employee an agent, bot or chatbot, or use exclamation marks."
+    ]
+  }
+}

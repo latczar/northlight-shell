@@ -1,0 +1,310 @@
+{
+  "business": {
+    "name": "Kestrel Garage",
+    "tagline": "An independent garage for brakes, suspension, tyres and servicing in Milbrook",
+    "phone": "01632 960 041",
+    "phone_href": "tel:+441632960041",
+    "street": "14 Mill Lane",
+    "city": "Milbrook",
+    "region": "Northshire",
+    "postal": "MB1 4KG",
+    "county": "Milbrook and the surrounding villages",
+    "directions_url": "/contact/",
+    "manager": "Robin Hale",
+    "hours": [
+      {
+        "days": "Monday to Friday",
+        "open": "8am",
+        "close": "5.30pm",
+        "schema": "Mo-Fr 08:00-17:30"
+      },
+      {
+        "days": "Saturday",
+        "open": "8.30am",
+        "close": "12.30pm",
+        "schema": "Sa 08:30-12:30"
+      },
+      {
+        "days": "Sunday",
+        "closed": true
+      }
+    ],
+    "service_area": [
+      "Milbrook",
+      "Ashwell Green",
+      "Upper Fenley",
+      "Harrowby",
+      "Coldmere"
+    ],
+    "url": "https://kestrel-garage.example"
+  },
+  "preview": {
+    "noindex": true,
+    "notice": "Kestrel Garage is a fictional business. This is a demo website, so the contact form does not send."
+  },
+  "nav": [
+    {
+      "label": "Services",
+      "href": "/services/"
+    },
+    {
+      "label": "About",
+      "href": "/about/"
+    },
+    {
+      "label": "News",
+      "href": "/news/"
+    },
+    {
+      "label": "Visit",
+      "href": "/contact/"
+    }
+  ],
+  "talk_cta": {
+    "label": "Plan your visit",
+    "href": "/contact/#appointment"
+  },
+  "home": {
+    "title": "Kestrel Garage | Brakes, Suspension, Tyres and Servicing in Milbrook",
+    "description": "Independent garage in Milbrook for brakes, suspension, tyres, wheel alignment and servicing. Call 01632 960 041.",
+    "slides": [
+      {
+        "tab": "Local garage",
+        "heading": "The friendly local garage",
+        "body": "Brakes, suspension, tyres and servicing in Milbrook, with straight answers before any work starts.",
+        "image": "kestrel-exterior.svg",
+        "video": "",
+        "alt": "Illustration of the Kestrel Garage workshop with three roller doors",
+        "accent": "in Milbrook"
+      },
+      {
+        "tab": "Brakes",
+        "heading": "Brakes you can count on.",
+        "body": "Squealing, grinding or a soft pedal? Bring it in and we'll take a look.",
+        "image": "kestrel-brakes.svg",
+        "alt": "Illustration of a brake disc",
+        "accent": "Stop with confidence."
+      },
+      {
+        "tab": "Tyres",
+        "heading": "Where the road meets the car.",
+        "body": "Tyres, rotations and alignment that keep you planted through every season.",
+        "image": "kestrel-tyres.svg",
+        "alt": "Illustration of a tyre and wheel",
+        "accent": "Tyres, done right."
+      }
+    ],
+    "primary_cta": {
+      "label": "Call to book",
+      "href": "tel:+441632960041"
+    },
+    "tiles_eyebrow": "What we do",
+    "tiles_heading": "What we work on.",
+    "tiles": [
+      {
+        "label": "Brakes",
+        "image": "kestrel-brakes.svg",
+        "href": "/services/brakes/",
+        "icon": "brake"
+      },
+      {
+        "label": "Suspension",
+        "image": "kestrel-suspension.svg",
+        "href": "/services/suspension/",
+        "icon": "spring"
+      },
+      {
+        "label": "Tyres",
+        "image": "kestrel-tyres.svg",
+        "href": "/services/tyres/",
+        "icon": "tyre"
+      },
+      {
+        "label": "Servicing",
+        "image": "kestrel-under-bonnet.svg",
+        "href": "/services/servicing/",
+        "icon": "wrench"
+      }
+    ],
+    "expect": {
+      "eyebrow": "Clean. Convenient. Clear.",
+      "heading": "Here's what you can expect.",
+      "body": "A short look inside the workshop: the bays, the team, and how a visit works from drop-off to collection.",
+      "video": "",
+      "poster": "kestrel-service-bays.svg",
+      "poster_alt": "Illustration of a car on a workshop lift",
+      "video_placeholder": "Intro video coming soon",
+      "points": [
+        {
+          "title": "Clean",
+          "body": "A tidy workshop and a comfortable place to wait while you have a cup of tea."
+        },
+        {
+          "title": "Convenient",
+          "body": "On Mill Lane, a short walk from Milbrook station. Open weekdays and Saturday mornings."
+        },
+        {
+          "title": "Clear",
+          "body": "Straight answers about what your car needs, and what it doesn't, before any work begins."
+        }
+      ]
+    },
+    "people": {
+      "eyebrow": "Meet the team at Kestrel",
+      "heading": "Meet Robin.",
+      "body": "Robin Hale runs the garage. You'll always speak to someone who knows your car.",
+      "story_placeholder": "Robin's story is coming soon.",
+      "image": "kestrel-front-desk.svg",
+      "image_alt": "Illustration of the garage front desk",
+      "photo_placeholder": "Team profiles are not written yet.",
+      "enabled": false
+    },
+    "reviews": {
+      "eyebrow": "In their words",
+      "quotes": [],
+      "enabled": false
+    },
+    "focus": {
+      "eyebrow": "Focused on what we do best",
+      "heading": "Brakes, suspension and tyres, done properly.",
+      "body": "Call the garage to talk through the work your car needs. We do not offer bodywork, paintwork or welding.",
+      "excluded": [
+        "Bodywork",
+        "Paintwork",
+        "Welding"
+      ],
+      "image": "kestrel-front-desk.svg",
+      "image_alt": "Illustration of the garage front desk"
+    },
+    "visit": {
+      "eyebrow": "Your local garage in Milbrook",
+      "heading": "Visit the garage.",
+      "image": "kestrel-entrance.svg",
+      "image_alt": "Illustration of the garage entrance",
+      "address_label": "Find us",
+      "hours_label": "Opening hours",
+      "phone_label": "Give us a call",
+      "phone_cta": "Call the garage",
+      "area_label": "Serving our neighbours"
+    },
+    "talk": {
+      "heading": "Car questions?",
+      "accent": "Start here.",
+      "body": "Tell us what you're noticing. We'll help you work out the next step."
+    },
+    "hero": {
+      "eyebrow": "Milbrook, Northshire",
+      "heading_lines": [
+        "Milbrook's",
+        "Independent Garage"
+      ],
+      "accent": "",
+      "local_note": "Independent.",
+      "location_note": "Right here on Mill Lane."
+    }
+  },
+  "services": {
+    "title": "Services | Kestrel Garage, Milbrook",
+    "description": "Brake repairs, suspension and steering, tyres, wheel alignment and servicing at Kestrel Garage on Mill Lane, Milbrook.",
+    "eyebrow": "Services",
+    "heading": "Brakes. Suspension. Tyres.",
+    "intro": "Brake repairs, suspension and steering, tyres and routine servicing. Call the garage to talk about your car and arrange a visit.",
+    "hero_image": "kestrel-service-bays.svg",
+    "hero_alt": "Illustration of a car on a workshop lift",
+    "items": [
+      {
+        "id": "brakes",
+        "title": "Brakes",
+        "body": "Brakes are the one system you can't afford to guess about. We inspect, repair and replace brake parts so your car stops the way it should.",
+        "list": [
+          "Brake inspection",
+          "Pads and discs",
+          "Brake fluid and repairs"
+        ],
+        "image": "kestrel-brakes.svg",
+        "alt": "Illustration of a brake disc"
+      },
+      {
+        "id": "suspension",
+        "title": "Suspension & steering",
+        "body": "Knocks over bumps, drifting, or a ride that feels loose? Suspension and steering work brings back a smooth, controlled drive.",
+        "list": [
+          "Steering and suspension repairs",
+          "Shock absorbers and springs",
+          "Track rod ends and bushes"
+        ],
+        "image": "kestrel-suspension.svg",
+        "alt": "Illustration of a suspension spring"
+      },
+      {
+        "id": "tyres",
+        "title": "Tyres & alignment",
+        "body": "From a puncture repair to a new set, we keep you rolling, and we keep you aligned so your tyres wear evenly and last longer.",
+        "list": [
+          "Tyres",
+          "Puncture repairs",
+          "Wheel alignment"
+        ],
+        "image": "kestrel-tyres.svg",
+        "alt": "Illustration of a tyre and wheel"
+      },
+      {
+        "id": "servicing",
+        "title": "Servicing",
+        "body": "The routine work that heads off bigger problems, including help getting ready for your MOT.",
+        "list": [
+          "Interim and full services",
+          "Batteries",
+          "Air and pollen filters",
+          "Wiper blades"
+        ],
+        "image": "kestrel-under-bonnet.svg",
+        "alt": "Illustration of a spanner"
+      }
+    ],
+    "not_offered_heading": "What we don't do",
+    "not_offered_body": "We don't offer bodywork, paintwork or welding. Call if you're not sure whether we can help with your car."
+  },
+  "about": {
+    "title": "About | Kestrel Garage, Milbrook",
+    "description": "An independent garage on Mill Lane in Milbrook. Find our location, opening hours and contact details.",
+    "eyebrow": "About Kestrel",
+    "heading": "Kestrel, on Mill Lane.",
+    "intro": "Kestrel Garage sits on Mill Lane in Milbrook, looking after drivers from the town and the surrounding villages.",
+    "hero_image": "kestrel-waiting-room.svg",
+    "hero_alt": "Illustration of the waiting area with a chair and a cup of tea",
+    "tour": {
+      "eyebrow": "Take the tour",
+      "heading": "See the workshop.",
+      "body": "A short video tour of the workshop is on its way.",
+      "video": "",
+      "poster": "kestrel-exterior.svg",
+      "video_placeholder": "Workshop tour coming soon"
+    }
+  },
+  "contact": {
+    "title": "Visit and Bookings | Kestrel Garage, Milbrook",
+    "description": "Find Kestrel Garage at 14 Mill Lane, Milbrook MB1 4KG. Open weekdays and Saturday mornings. Call 01632 960 041 to book.",
+    "eyebrow": "Visit",
+    "heading": "Car questions?",
+    "intro": "Tell us what you're noticing. We'll help you work out the next step. Call or pop in to the garage.",
+    "form": {
+      "heading": "Request a booking",
+      "services": [
+        "Brakes",
+        "Suspension & steering",
+        "Tyres & alignment",
+        "Servicing",
+        "Something else"
+      ],
+      "preview_note": "Demo site: this form doesn't send. Kestrel Garage is a fictional business."
+    },
+    "accent": "Start here.",
+    "booking": {
+      "heading": "Let's get you booked in.",
+      "body": "Call the front desk with your car's make, model and registration, the work you need, and a day that suits you. We'll confirm availability and the next step.",
+      "cta": "Call 01632 960 041"
+    }
+  },
+  "credits": "Illustrations are placeholders for a fictional business."
+}

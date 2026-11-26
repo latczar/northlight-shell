@@ -1,0 +1,22 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  // The front desk: holds every service credential and sends the brain's checked requests. RPC only.
+  "name": "northlight-desk",
+  "main": "index.ts",
+  "compatibility_date": "2026-10-01",
+  // Same flags as the brain: the agents' code is bundled here too.
+  "compatibility_flags": ["nodejs_compat"],
+  // Reachable only through the brain's `DESK` service binding: no workers.dev URL, no routes.
+  "workers_dev": false,
+  "preview_urls": false,
+  // The brain's Dashboard object: the desk writes the connection log there and reads setting overrides.
+  "durable_objects": {
+    "bindings": [
+      { "name": "DASHBOARD", "class_name": "Dashboard", "script_name": "northlight-agent" }
+    ]
+  },
+  // Same bucket as the brain's IMAGES: an agent's `owns` reads the records its tools kept there.
+  "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "northlight-images" }],
+  // Workers Logs. The code logs nothing from requests; statuses and refusals go to the connection log.
+  "observability": { "enabled": true }
+}

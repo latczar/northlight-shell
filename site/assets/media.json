@@ -1,0 +1,62 @@
+{
+  "note": "Generated placeholder illustrations for a fictional business. Regenerate with node scripts/make-placeholders.mjs.",
+  "images": [
+    {
+      "file": "img/kestrel-exterior.svg",
+      "bytes": 2140,
+      "sha256": "3722aee37ca55e66d0de755b5f8ef93624d704bc2ee4aa5d0466faeeda559199"
+    },
+    {
+      "file": "img/kestrel-brakes.svg",
+      "bytes": 730,
+      "sha256": "4b71d821a264051cb9c643e04cc8f691e3ea38c1f29dc3a7f3ad8509aa6b2cef"
+    },
+    {
+      "file": "img/kestrel-suspension.svg",
+      "bytes": 668,
+      "sha256": "641a2b18dcb609b4a428f43ef4b5f39027173b90503c171b61ec6e079b1c64a0"
+    },
+    {
+      "file": "img/kestrel-tyres.svg",
+      "bytes": 696,
+      "sha256": "cf2c3a09d3c22d7395fcd613c82d6ba6727eca4b66888ed6e780abcf1674f44d"
+    },
+    {
+      "file": "img/kestrel-service-bays.svg",
+      "bytes": 779,
+      "sha256": "d1ce037fc216cde59114fc42e0188effaa23307fb128ca3540ecda15df1e1fbc"
+    },
+    {
+      "file": "img/kestrel-under-bonnet.svg",
+      "bytes": 677,
+      "sha256": "65790ab9f580051c5ad265dc09660bacdebc6980187e647170052bda22b0cc9e"
+    },
+    {
+      "file": "img/kestrel-front-desk.svg",
+      "bytes": 679,
+      "sha256": "d78fe826045fc579aa774946a27d6aa831a29b492f94b40faa45dada875469c5"
+    },
+    {
+      "file": "img/kestrel-entrance.svg",
+      "bytes": 670,
+      "sha256": "befaf49e1369c74392fe2fd3f98bf27171773451ac985bfc895b983da69ca476"
+    },
+    {
+      "file": "img/kestrel-waiting-room.svg",
+      "bytes": 697,
+      "sha256": "9dfd091624c85c09983dfcdbeb1d622dd3dc021edae5623e6d0e26f5b889fbd8"
+    }
+  ],
+  "brand": [
+    {
+      "file": "brand/kestrel-badge.svg",
+      "bytes": 447,
+      "sha256": "715a3da18b9a3bb04f8f8cfbb0fef8fff8c3d81064eb6654ac2d4616a91cc378"
+    },
+    {
+      "file": "brand/northlight-mark.svg",
+      "bytes": 164,
+      "sha256": "e9d6741f464e8e93dace2c2d0916a8e710e82c27b419545af8cee73399df8e16"
+    }
+  ]
+}

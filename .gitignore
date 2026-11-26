@@ -1,0 +1,27 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+.wrangler/
+.vercel/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Secrets: never commit real values
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.secrets/
+**/supabase/.temp/
+**/supabase/.branches/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

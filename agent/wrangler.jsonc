@@ -1,0 +1,52 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "northlight-agent",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  // The MCP client SDK uses Node built-ins.
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      { "name": "CONVERSATIONS", "class_name": "Conversation" },
+      { "name": "MEMORY", "class_name": "Memory" },
+      { "name": "DASHBOARD", "class_name": "Dashboard" },
+      { "name": "SCHEDULER", "class_name": "Scheduler" },
+      { "name": "USAGE", "class_name": "Usage" },
+      { "name": "LEARNING", "class_name": "Learning" },
+      { "name": "LEADS", "class_name": "Leads" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Conversation", "Memory", "Dashboard", "Scheduler", "Usage", "Learning", "Leads"] }
+  ],
+  // This Worker's own public address: the lead intake address a new site is given (src/leads.ts). With the secret
+  // LEADS_SIGNING_KEY (set with `wrangler secret put`) beside it, new sites are pointed here.
+  // Replace change-me with your workers.dev subdomain after the first deploy.
+  "vars": { "BRAIN_URL": "https://northlight-agent.change-me.workers.dev" },
+  // Per client per minute (keyed by client id in src/index.ts): 60 requests for chats and everything else, 300 for the
+  // media library on its own (an upload is two requests a file, three files at a time from the agents app), 120 for
+  // the lead list, export and share-link settings, and another 120 (same limiter, key `<client>/shared`) for what share
+  // links open. Call status polling has its own 300 per client per minute, after 120 per signed person per minute.
+  // Per site per minute: 30 leads into the intake.
+  "ratelimits": [
+    { "name": "CLIENT_LIMITER", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } },
+    { "name": "MEDIA_LIMITER", "namespace_id": "1002", "simple": { "limit": 300, "period": 60 } },
+    { "name": "LEADS_LIMITER", "namespace_id": "1003", "simple": { "limit": 120, "period": 60 } },
+    { "name": "LEAD_INTAKE_LIMITER", "namespace_id": "1004", "simple": { "limit": 30, "period": 60 } },
+    { "name": "STATUS_LIMITER", "namespace_id": "1005", "simple": { "limit": 300, "period": 60 } },
+    { "name": "STATUS_PERSON_LIMITER", "namespace_id": "1006", "simple": { "limit": 120, "period": 60 } }
+  ],
+  // Workers Logs. The code logs statuses and error names only, never message contents or secrets.
+  "observability": { "enabled": true },
+  // Hourly safety net: re-sets each client's scheduler alarm after deploys or config changes.
+  // The jobs themselves run on Durable Object alarms at their exact local times.
+  "triggers": { "crons": ["7 * * * *"] },
+  // Image drafts and agent records (IMAGES) and the client media library (MEDIA: uploads and attachments).
+  // Local in `wrangler dev`. Create both buckets before the first deploy: `npx wrangler r2 bucket create <name>`.
+  "r2_buckets": [
+    { "binding": "IMAGES", "bucket_name": "northlight-images" },
+    { "binding": "MEDIA", "bucket_name": "northlight-media" }
+  ],
+  // Normally deploy the desk first; register new brain DO classes before the desk binds them. Never handed to tools.
+  "services": [{ "binding": "DESK", "service": "northlight-desk", "entrypoint": "Desk" }]
+}

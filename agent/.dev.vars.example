@@ -1,0 +1,18 @@
+# Copy to .dev.vars for `npm run dev`. Never commit real values.
+# The brain holds only these. Service keys (GitHub, PageSpeed, R2 upload signing) live in the desk Worker: desk/.dev.vars.example.
+# In production: `npx wrangler secret put <NAME>`.
+# Model key, named by the model's secretEnv in clients/kestrel/client.json.
+OPENAI_API_KEY=
+# Kestrel Garage. 32+ random characters each, all different. These stay on the server (the console), never in the browser.
+# The client token: the console sends it as `authorization: Bearer ...`.
+CLIENT_TOKEN_KESTREL=
+# Signs user passes; the console holds the same value.
+USER_SIGNING_KEY_KESTREL=
+# Signs staff passes for the client dashboard page.
+DASHBOARD_SIGNING_KEY_KESTREL=
+# Signs approver and admin passes (approve/decline, settings); the console holds the same value.
+APPROVER_SIGNING_KEY_KESTREL=
+# Signs the approver lists the console pushes (PUT /v1/access/approvers); the console holds the same value.
+ACCESS_SIGNING_KEY_KESTREL=
+# Optional. Makes each new site's lead intake key (README "Leads"). Changing it cuts every site off.
+LEADS_SIGNING_KEY=

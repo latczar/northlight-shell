@@ -1,0 +1,31 @@
+{
+  "slug": "signs-your-brakes-need-attention",
+  "status": "published",
+  "date": "2026-11-04",
+  "category": "Brakes",
+  "title": "Signs your brakes need attention",
+  "summary": "Squeals, grinding and a pedal that feels different are all worth a call. Here is what each one can mean.",
+  "image": "kestrel-brakes.svg",
+  "image_alt": "Illustration of a brake disc",
+  "author": "The Kestrel Garage team",
+  "body": [
+    {
+      "p": "Brakes usually give some warning before they need work. Noticing the change early often keeps the repair simpler."
+    },
+    {
+      "h2": "What to listen and feel for"
+    },
+    {
+      "ul": [
+        "A high-pitched squeal when you brake can be the pad wear indicator.",
+        "Grinding can mean the pads are worn through.",
+        "A soft or sinking pedal needs checking straight away.",
+        "The car pulling to one side under braking is worth an inspection."
+      ]
+    },
+    {
+      "p": "Tell the front desk what you have noticed and when it happens. If the car feels unsafe, do not drive it: arrange recovery instead."
+    }
+  ],
+  "sources": []
+}

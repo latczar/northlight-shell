@@ -1,0 +1,28 @@
+{
+  "slug": "pothole-damage-what-to-check",
+  "status": "published",
+  "date": "2026-10-07",
+  "category": "Suspension",
+  "title": "Hit a pothole? What to check afterwards",
+  "summary": "A hard knock can damage tyres, wheels and suspension. These are the signs to look out for in the days after.",
+  "image": "kestrel-suspension.svg",
+  "image_alt": "Illustration of a suspension spring",
+  "author": "The Kestrel Garage team",
+  "body": [
+    {
+      "p": "Most pothole knocks cause no lasting harm, but a heavy one can bend a wheel or upset the alignment."
+    },
+    {
+      "ul": [
+        "A bulge or cut in the tyre sidewall.",
+        "The steering wheel sitting off centre on a straight road.",
+        "A new knock or rattle over bumps.",
+        "The car pulling to one side."
+      ]
+    },
+    {
+      "p": "If you notice any of these, call the garage to arrange a check."
+    }
+  ],
+  "sources": []
+}

@@ -1,0 +1,23 @@
+{
+  "slug": "interim-or-full-service",
+  "status": "published",
+  "date": "2026-09-23",
+  "category": "Maintenance",
+  "title": "Interim or full service: which one do you need?",
+  "summary": "The right service depends on your mileage and how long it has been since the last one. Here is a simple way to decide.",
+  "image": "kestrel-service-bays.svg",
+  "image_alt": "Illustration of a car on a workshop lift",
+  "author": "The Kestrel Garage team",
+  "body": [
+    {
+      "p": "An interim service covers the essentials, such as oil, filter and safety checks. A full service adds more checks and replacement parts."
+    },
+    {
+      "p": "Your handbook sets the intervals for your car. If you drive a lot of miles, an interim service between full services can help."
+    },
+    {
+      "callout": "Bring your service history when you visit so we can see what was done last time."
+    }
+  ],
+  "sources": []
+}

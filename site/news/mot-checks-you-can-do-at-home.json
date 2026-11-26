@@ -1,0 +1,40 @@
+{
+  "slug": "mot-checks-you-can-do-at-home",
+  "status": "published",
+  "date": "2026-11-18",
+  "category": "MOT",
+  "title": "MOT checks you can do at home before the test",
+  "summary": "A few minutes with your car before its MOT can catch simple faults like a blown bulb or worn wiper blade.",
+  "image": "kestrel-under-bonnet.svg",
+  "image_alt": "Illustration of a spanner",
+  "author": "The Kestrel Garage team",
+  "featured": true,
+  "body": [
+    {
+      "p": "Plenty of MOT failures come down to small things that are quick to spot at home. Walking round the car the week before the test gives you time to sort them."
+    },
+    {
+      "h2": "A quick walk round"
+    },
+    {
+      "ul": [
+        "Check every light works, including indicators, brake lights and the number plate lamp.",
+        "Look at the wiper blades for splits and top up the screen wash.",
+        "Check the tyres for cuts, bulges and tread depth.",
+        "Make sure the number plates are clean and easy to read."
+      ]
+    },
+    {
+      "callout": "Your MOT certificate shows the expiry date. You can book the test up to a month before it runs out and keep the same renewal date."
+    },
+    {
+      "p": "If something looks wrong, call the garage and we can talk you through the next step."
+    }
+  ],
+  "sources": [
+    {
+      "label": "GOV.UK: Getting an MOT",
+      "url": "https://www.gov.uk/getting-an-mot"
+    }
+  ]
+}

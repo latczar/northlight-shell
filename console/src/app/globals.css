@@ -1,0 +1,321 @@
+/*
+  Northlight, the client app's design system (DESIGN.md). Charcoal for the dark surfaces and the top bar, teal for the one
+  accent (teal ink on light, bright teal on dark), cool neutrals and four state colours. Manrope sets headings, Inter
+  everything else you read, Geist Mono only literal strings. Components style through the role tokens below (bg-ground,
+  bg-card, text-ink, border-rule ...); the theme blocks only re-set the variables, so no utility needs dark:.
+*/
+@import "tailwindcss";
+
+/* Roles at their light values. Text roles are at least 4.5:1 on ground, card and inset; rule-strong and focus at least
+   3:1. accent is teal ink (#0f766e), so white type on it reaches 5.4:1. spark is the mark's teal (#14b8a6), never text. */
+@theme {
+  --color-ground: #f6f8f8;
+  --color-card: #ffffff;
+  --color-raised: #ffffff;
+  --color-inset: #f6f8f8;
+  --color-ink: #1f2328;
+  --color-ink-2: #4a545d;
+  --color-ink-3: #5b6670;
+  --color-rule: #dde3e6;
+  --color-rule-strong: #7d878f;
+  --color-accent: #0f766e;
+  --color-accent-hover: #0d625b;
+  --color-accent-text: #0f766e;
+  --color-on-accent: #ffffff;
+  --color-tint: #e6f6f4;
+  --color-spark: #14b8a6;
+  --color-focus: #0f766e;
+  --color-ok: #157a51;
+  --color-ok-dot: #1f9d6b;
+  --color-warn: #855700;
+  --color-warn-dot: #e0a73a;
+  --color-danger: #b53939;
+  --color-danger-dot: #cf4b4b;
+  --color-quiet-dot: #6b7680;
+  /* the top bar is charcoal in both themes; charcoal appears in the bar and the avatars only */
+  --color-bar: #16191d;
+  --color-bar-ink: #ffffff;
+  --color-bar-ink-2: #c3cad0;
+  --color-bar-rule: #2c3138;
+  --color-avatar: #1f2328;
+  --color-avatar-ink: #ffffff;
+  --color-scrim: rgb(22 25 29 / 0.55);
+}
+
+@theme {
+  --font-sans: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-manrope), var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* Type roles on the browser's 16px root: one utility sets size, line height, weight and tracking. Tailwind's default
+   scale is cleared, so nothing below 12px exists. */
+@theme {
+  --text-*: initial;
+  /* keys, table heads, speaker names; sentence case */
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
+  --text-label--font-weight: 500;
+  /* times, counts, sizes (tabular figures, below) */
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1rem;
+  /* values, hints, captions; 500-600 for buttons, tabs and menu items */
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+  /* prose and every field, so a phone never zooms in on focus */
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  /* item titles: a request, a piece of work, a lesson */
+  --text-title: 1rem;
+  --text-title--line-height: 1.5rem;
+  --text-title--font-weight: 600;
+  /* section and dialog headings */
+  --text-heading: 1.25rem;
+  --text-heading--line-height: 1.75rem;
+  --text-heading--font-weight: 600;
+  /* one page title per page */
+  --text-display: 1.75rem;
+  --text-display--line-height: 2.125rem;
+  --text-display--font-weight: 600;
+  --text-display--letter-spacing: -0.02em;
+}
+
+@utility text-meta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Motion: one ease-out curve, 150ms for state changes, 200ms for a block that arrives. The north star's slow twinkle is
+   the brand's one signature move. */
+@theme {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: var(--ease-out);
+  --animate-enter: enter 200ms var(--ease-out);
+  --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-live: live 2.4s var(--ease-out) infinite;
+  --animate-spin-slow: spin 2.4s linear infinite;
+
+  @keyframes enter {
+    from {
+      opacity: 0.6;
+      translate: 0 4px;
+    }
+  }
+  @keyframes shimmer {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 100% 0;
+    }
+  }
+  @keyframes live {
+    from {
+      opacity: 0.5;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 2.6;
+    }
+  }
+}
+
+/* dark: follows the theme: a pinned theme on <html> (src/lib/theme.ts), the system setting otherwise. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+@layer base {
+  /* Dark: a charcoal ground, elevation by surface colour (card a step up, raised another, inset a step down), quiet
+     hairlines. Bright teal is the accent, with charcoal type on it. Not light inverted. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --color-ground: #16191d;
+      --color-card: #1f2328;
+      --color-raised: #262b31;
+      --color-inset: #111417;
+      --color-ink: #e8ecef;
+      --color-ink-2: #c3cad0;
+      --color-ink-3: #9aa4ad;
+      --color-rule: #2c3138;
+      --color-rule-strong: #66717a;
+      --color-accent: #2dd4bf;
+      --color-accent-hover: #5eead4;
+      --color-accent-text: #2dd4bf;
+      --color-on-accent: #16191d;
+      --color-tint: #12302d;
+      --color-spark: #2dd4bf;
+      --color-focus: #2dd4bf;
+      --color-ok: #37c98d;
+      --color-ok-dot: #37c98d;
+      --color-warn: #f0bc55;
+      --color-warn-dot: #f0bc55;
+      --color-danger: #f06b6b;
+      --color-danger-dot: #f06b6b;
+      --color-quiet-dot: #9aa4ad;
+      --color-bar: #111417;
+      --color-avatar: #2c3138;
+      --color-scrim: rgb(17 20 23 / 0.7);
+    }
+  }
+  /* a pinned dark root, or a dark island inside any page (the sign-in's charcoal panel) */
+  :root[data-theme="dark"],
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --color-ground: #16191d;
+    --color-card: #1f2328;
+    --color-raised: #262b31;
+    --color-inset: #111417;
+    --color-ink: #e8ecef;
+    --color-ink-2: #c3cad0;
+    --color-ink-3: #9aa4ad;
+    --color-rule: #2c3138;
+    --color-rule-strong: #66717a;
+    --color-accent: #2dd4bf;
+    --color-accent-hover: #5eead4;
+    --color-accent-text: #2dd4bf;
+    --color-on-accent: #16191d;
+    --color-tint: #12302d;
+    --color-spark: #2dd4bf;
+    --color-focus: #2dd4bf;
+    --color-ok: #37c98d;
+    --color-ok-dot: #37c98d;
+    --color-warn: #f0bc55;
+    --color-warn-dot: #f0bc55;
+    --color-danger: #f06b6b;
+    --color-danger-dot: #f06b6b;
+    --color-quiet-dot: #9aa4ad;
+    --color-bar: #111417;
+    --color-avatar: #2c3138;
+    --color-scrim: rgb(17 20 23 / 0.7);
+  }
+  :root {
+    color-scheme: light;
+    accent-color: var(--color-accent);
+    scrollbar-color: var(--color-rule-strong) transparent;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-ink);
+    background: var(--color-ground);
+    text-rendering: optimizeLegibility;
+  }
+  /* light type on charcoal needs smoothing; the light theme keeps full rendering */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+  :root[data-theme="dark"] body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* headings and the page title are Manrope; everything else stays Inter */
+  h1,
+  h2,
+  h3,
+  .text-display,
+  .text-heading {
+    font-family: var(--font-display);
+  }
+
+  /* the browser's own surfaces carry the palette: selection, the caret, one focus ring */
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  input,
+  textarea,
+  [contenteditable] {
+    caret-color: var(--color-accent-text);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline-color: Highlight;
+    }
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+  /* every Lucide glyph draws a 1.5px line at any size (server- and client-rendered alike) and never shrinks in a row */
+  svg.lucide {
+    flex-shrink: 0;
+    stroke-width: 1.5px;
+  }
+  svg.lucide * {
+    vector-effect: non-scaling-stroke;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --animate-enter: none;
+      --animate-shimmer: none;
+      --animate-live: none;
+    }
+  }
+
+  /* a theme switch is one instant flip (src/lib/theme.ts sets this for two frames) */
+  html[data-theme-switching] *,
+  html[data-theme-switching] ::before,
+  html[data-theme-switching] ::after {
+    transition: none !important;
+  }
+}
+
+/* The north star's twinkle: a short dip in size and light, then a long rest. Still under reduced motion. */
+@layer components {
+  .star-twinkle {
+    animation: star-twinkle 7s var(--ease-out) infinite;
+  }
+  @keyframes star-twinkle {
+    0%,
+    86%,
+    100% {
+      scale: 1;
+      opacity: 1;
+    }
+    92% {
+      scale: 0.8;
+      opacity: 0.75;
+    }
+  }
+  /* the orbit's nodes drift on the compositor, one layer per ring */
+  .orbit-drift {
+    animation: orbit-drift var(--drift, 40s) linear infinite;
+    animation-direction: var(--drift-direction, normal);
+  }
+  @keyframes orbit-drift {
+    to {
+      rotate: 1turn;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .star-twinkle,
+    .orbit-drift {
+      animation: none;
+    }
+  }
+}

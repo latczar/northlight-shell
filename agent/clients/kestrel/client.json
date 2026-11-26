@@ -1,0 +1,31 @@
+{
+  "id": "kestrel",
+  "name": "Kestrel Garage",
+  "tokenEnv": "CLIENT_TOKEN_KESTREL",
+  "userSigningEnv": "USER_SIGNING_KEY_KESTREL",
+  "dashboardSigningEnv": "DASHBOARD_SIGNING_KEY_KESTREL",
+  "approverSigningEnv": "APPROVER_SIGNING_KEY_KESTREL",
+  "accessSigningEnv": "ACCESS_SIGNING_KEY_KESTREL",
+  "approvers": [],
+  "agents": [
+    "iris"
+  ],
+  "permissions": [
+    "time.read",
+    "setup.read"
+  ],
+  "dailyCostCapUsd": 5,
+  "model": {
+    "baseURL": "https://api.openai.com/v1",
+    "model": "gpt-5.4-mini",
+    "secretEnv": "OPENAI_API_KEY",
+    "inputCostPerMillion": 0.75,
+    "outputCostPerMillion": 4.5,
+    "maxOutputTokens": 32000,
+    "maxTokensParam": "max_completion_tokens",
+    "contextWindowTokens": 128000,
+    "extraBody": {
+      "reasoning_effort": "low"
+    }
+  }
+}

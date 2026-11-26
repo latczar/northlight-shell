@@ -1,0 +1,9 @@
+public/
+node_modules/
+.DS_Store
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+playwright-report/
+test-results/
