@@ -1,6 +1,5 @@
 node_modules/
 .next/
-.env*
 !.env.example
 .vercel/
 coverage/
@@ -10,3 +9,5 @@ next-env.d.ts
 .impeccable/review/
 graphify-out/
 test-results/
+
+.vercel

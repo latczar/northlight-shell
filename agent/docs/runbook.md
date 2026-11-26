@@ -41,7 +41,7 @@ npx wrangler r2 bucket create northlight-media
 
 R2 must be enabled on the account before a bucket can be created. Cloudflare asks for a payment method to enable R2, even though usage within the free allowance is not charged.
 
-After the first brain deploy, replace `change-me` in `BRAIN_URL` (`wrangler.jsonc`) and in `clients/kestrel/iris.json` (`site`) with the real addresses, and deploy again.
+If you deploy to your own Cloudflare account, replace `latczar` in `BRAIN_URL` (`wrangler.jsonc`) and in `clients/kestrel/iris.json` (`site`) with your workers.dev subdomain, and deploy again.
 
 ### Secrets
 

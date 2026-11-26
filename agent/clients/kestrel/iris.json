@@ -13,7 +13,7 @@
     "designNotes": "The owner approved the current homepage heading. Preserve it during routine SEO work. Ask staff before proposing a different heading.",
     "businessName": "Kestrel Garage",
     "location": "Milbrook",
-    "site": "https://kestrel-garage-site.change-me.workers.dev",
+    "site": "https://kestrel-garage-site.latczar.workers.dev",
     "timezone": "Europe/London",
     "repository": "latczar/northlight-shell",
     "baseBranch": "main",
@@ -29,7 +29,7 @@
       "id": "managed_website",
       "access": "read",
       "hosts": [
-        "kestrel-garage-site.change-me.workers.dev"
+        "kestrel-garage-site.latczar.workers.dev"
       ]
     },
     {

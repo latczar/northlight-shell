@@ -21,8 +21,7 @@
   ],
   // This Worker's own public address: the lead intake address a new site is given (src/leads.ts). With the secret
   // LEADS_SIGNING_KEY (set with `wrangler secret put`) beside it, new sites are pointed here.
-  // Replace change-me with your workers.dev subdomain after the first deploy.
-  "vars": { "BRAIN_URL": "https://northlight-agent.change-me.workers.dev" },
+  "vars": { "BRAIN_URL": "https://northlight-agent.latczar.workers.dev" },
   // Per client per minute (keyed by client id in src/index.ts): 60 requests for chats and everything else, 300 for the
   // media library on its own (an upload is two requests a file, three files at a time from the agents app), 120 for
   // the lead list, export and share-link settings, and another 120 (same limiter, key `<client>/shared`) for what share

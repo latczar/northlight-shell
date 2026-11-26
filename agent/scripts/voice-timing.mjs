@@ -2,7 +2,7 @@
 // in that call's conversation. Prints what the caller would wait for; the brain's Workers Logs hold the per-step split
 // (events voice_request_timing and voice_turn_timing, matched by input id).
 // Usage: BRAIN_URL=https://… CLIENT_TOKEN_KESTREL=… node scripts/voice-timing.mjs
-const BRAIN = process.env.BRAIN_URL ?? "https://northlight-agent.change-me.workers.dev";
+const BRAIN = process.env.BRAIN_URL ?? "https://northlight-agent.latczar.workers.dev";
 const TOKEN = process.env.CLIENT_TOKEN_KESTREL;
 if (!TOKEN) throw new Error("Set CLIENT_TOKEN_KESTREL.");
 const auth = { authorization: `Bearer ${TOKEN}`, "content-type": "application/json" };
