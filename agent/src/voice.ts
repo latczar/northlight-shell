@@ -14,6 +14,8 @@ export const MOMENTS = ["Just give me one momentâ€¦ ", "One moment while I lookâ
 export const STILL_CHECKING = ["I'm still checking on your request, it'll just be a moment longer. ", "Still working on that for you, it'll just be a moment longer. "];
 /** Said when the running work has not finished after the wait; its answer is spoken on the caller's next request. */
 export const STILL_WORKING = "It's taking a little longer than usual. I'm still on it, and I'll tell you as soon as I have it.";
+/** Said to a caller who has gone quiet (ElevenLabs sends "..." for them): a full sentence, so it is spoken at once. */
+export const SILENCE_SPOKEN = "I'm here whenever you're ready. Ask me anything about the website.";
 /** A job owns the conversation (typed chat): the call cannot start a second loop beside it. */
 export const JOB_RUNNING_SPOKEN = "I'm still working on your last request. Give me a moment, then ask again.";
 /** Seconds of lookup with no answer before the one progress line is spoken. */

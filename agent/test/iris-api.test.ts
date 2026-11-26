@@ -1,6 +1,7 @@
 import { env, runInDurableObject, SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { signUserPass } from "../src/user-auth";
+import { SILENCE_SPOKEN, SPOKEN_AT_ONCE } from "../src/voice";
 import type { ModelAdapter } from "../src/model";
 
 const headers = { authorization: "Bearer test-token-kestrel-0123456789abcdef", "content-type": "application/json" };
@@ -64,8 +65,8 @@ describe("Iris staff app API", () => {
     expect(body).toContain("data: [DONE]");
   });
 
-  it("stays quiet when ElevenLabs sends its silence prompt, without a model call or a saved turn", async () => {
-    // ElevenLabs sends "..." as the caller's words after a few seconds of silence (measured 2026-11-26: every ~11 s).
+  it("answers ElevenLabs' silence prompt with one fixed line, without a model call or a saved turn", async () => {
+    // ElevenLabs sends "..." as the caller's words after a spell of silence, and drops the call if the answer is empty.
     const conversation = `voice-web:voice-visitor-${crypto.randomUUID()}`;
     const stub = await installFake(conversation);
     const userAuth = await signUserPass(key, "kestrel", "web:voice-visitor", expires());
@@ -79,7 +80,9 @@ describe("Iris staff app API", () => {
       const body = await response.text();
       expect(body).toContain('"finish_reason":"stop"');
       expect(body).toContain("data: [DONE]");
-      expect(body).not.toContain('"content"');
+      expect((body.match(/"content"/g) ?? []).length).toBe(1);
+      expect(body).toContain(JSON.stringify({ content: SILENCE_SPOKEN }));
+      expect(SILENCE_SPOKEN.length).toBeGreaterThanOrEqual(SPOKEN_AT_ONCE);
     }
     expect(await runInDurableObject(stub, (_instance, state) => state.storage.get<number>("test-model-calls"))).toBeUndefined();
   });

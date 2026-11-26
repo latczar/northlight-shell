@@ -14,6 +14,7 @@ import { leadIntake, LEADS_TOOL, leadsRoute, sharedLeads } from "./lead-routes";
 import { MEDIA_TOOL } from "./media";
 import { mediaRoute } from "./media-routes";
 import { approvedCallers, phoneStart } from "./phone";
+import { SILENCE_SPOKEN } from "./voice";
 import { localTime, SLACK_USER, slackEvents, slackInteractions } from "./slack";
 import { verifyUserPass } from "./user-auth";
 import { TOOLS } from "../tools";
@@ -249,11 +250,13 @@ async function completions(request: Request, env: Env, client: ClientConfig): Pr
   const chunk = (delta: Record<string, unknown>, finish: string | null = null) =>
     JSON.stringify({ id: completionId, object: "chat.completion.chunk", created, model: agentId, choices: [{ index: 0, delta, finish_reason: finish }] });
 
-  // ElevenLabs sends "..." as the caller's words after a few seconds of silence (measured 2026-11-26: every ~11 s while
-  // nobody spoke, 27 times in one call). Nobody said it: the reply is empty, and no model runs and no turn is saved.
+  // ElevenLabs sends "..." as the caller's words after a spell of silence (measured 2026-11-26: every ~11 s while nobody
+  // spoke, 27 times in one call, each answered by the model). Nobody said it: one fixed line answers, and no model runs and
+  // no turn is saved. The line is never empty: ElevenLabs retries an empty answer three times, then drops the call.
   if (SILENCE.test(text)) {
     return sse(async send => {
       send(chunk({ role: "assistant" }));
+      send(chunk({ content: SILENCE_SPOKEN }));
       send(chunk({}, "stop"));
       send("[DONE]");
     }, request);
