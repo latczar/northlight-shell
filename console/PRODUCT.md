@@ -9,7 +9,7 @@ web
 ## Stack
 
 Next.js 16 (App Router) on Vercel, React 19, Tailwind CSS 4, Lucide icons, Manrope, Inter and Geist Mono. Supabase for
-sign-in (6-digit email code) and the access table. The agent (Cloudflare Workers, `../agent` in this repository) is the
+sign-in (email and password) and the access table. The agent (Cloudflare Workers, `../agent` in this repository) is the
 backend for everything the employees do.
 
 ## Users

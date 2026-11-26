@@ -10,6 +10,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Field";
 import { EmptyState, Notice } from "@/components/ui/Notice";
 import { ring } from "@/components/ui/ring";
+import { MIN_PASSWORD } from "@/lib/password";
 import type { EmployeeAccess, Person, SyncState } from "@/lib/server/people";
 
 type Employee = { id: string; name: string };
@@ -194,12 +195,17 @@ export function PeopleManager({
         agents={agents}
         clientName={clientName}
         onClose={() => setDialog(d => ({ ...d, open: false }))}
-        onSave={async (email, name, rows) => {
+        onSave={async (email, name, password, rows) => {
           const person = dialog.person;
-          const result = person ? await savePersonAction(clientId, person.userId, rows, person.changedAt) : await addPersonAction(clientId, email, name, rows);
+          const result = person ? await savePersonAction(clientId, person.userId, rows, person.changedAt, password) : await addPersonAction(clientId, email, name, password, rows);
           // a refusal stays in the dialog, beside what was typed
           if (!result.ok) return result.error;
-          finish(result, person ? `Saved ${person.name ?? person.email}'s access.` : `${email.trim().toLowerCase()} has access to ${clientName}. Tell them to sign in at ${signInAddress}.`);
+          finish(
+            result,
+            person
+              ? `Saved ${person.name ?? person.email}'s access${password ? " and their new password" : ""}.`
+              : `${email.trim().toLowerCase()} has access to ${clientName}. Give them the password you set and tell them to sign in at ${signInAddress}.`,
+          );
           return null;
         }}
       />
@@ -221,11 +227,12 @@ function AccessDialog({
   agents: Employee[];
   clientName: string;
   onClose: () => void;
-  onSave: (email: string, name: string, rows: EmployeeAccess[]) => Promise<string | null>;
+  onSave: (email: string, name: string, password: string, rows: EmployeeAccess[]) => Promise<string | null>;
 }) {
   const formId = useId();
   const [email, setEmail] = useState(person?.email ?? "");
   const [name, setName] = useState(person?.name ?? "");
+  const [password, setPassword] = useState("");
   const [rows, setRows] = useState<EmployeeAccess[]>(person ? person.access : agents.map(a => ({ agentId: a.id, canApprove: false, canManage: false })));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -265,7 +272,7 @@ function AccessDialog({
           e.preventDefault();
           setSaving(true);
           setError(null);
-          const problem = await onSave(email, name, rows);
+          const problem = await onSave(email, name, password, rows);
           setSaving(false);
           if (problem) setError(problem);
           else onClose();
@@ -277,6 +284,15 @@ function AccessDialog({
             <Input label="Name (optional)" value={name} maxLength={80} onChange={e => setName(e.target.value)} />
           </>
         )}
+        <Input
+          label={person ? "New password (optional)" : "Password"}
+          type="password"
+          autoComplete="new-password"
+          required={!person}
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          hint={person ? "Fill this in only to replace their password, for example if they have forgotten it." : `At least ${MIN_PASSWORD} characters. They can change it after signing in.`}
+        />
         <fieldset className="flex flex-col gap-3">
           <legend className="mb-2 text-label text-ink-2">AI employees</legend>
           {agents.map(a => {

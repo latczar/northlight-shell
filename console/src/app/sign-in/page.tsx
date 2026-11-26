@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Sign in" };
 
 /*
  Sign in, the one brand moment: a charcoal panel with the orbit and the mark, light everything else. The
- form asks for an email and the 6-digit code Northlight emails; no passwords.
+ form asks for an email and password.
 */
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const query = await searchParams;

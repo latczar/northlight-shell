@@ -1,11 +1,12 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { KeyRound, LogOut } from "lucide-react";
 import { ThemeSwitch } from "@/components/ui/ThemeSwitch";
 import { ring } from "@/components/ui/ring";
 
 /*
- The account menu: who is signed in, the theme, and Sign out. A native popover: it opens in the top layer, Escape and a
+ The account menu: who is signed in, the theme, Change password and Sign out. A native popover: it opens in the top layer, Escape and a
  click outside close it, and focus returns to the button.
 */
 export function AccountMenu({ name, email, admin }: { name: string; email: string; admin: boolean }) {
@@ -34,7 +35,17 @@ export function AccountMenu({ name, email, admin }: { name: string; email: strin
           <p className="mb-2 text-label text-ink-2">Theme</p>
           <ThemeSwitch />
         </div>
-        <form action="/auth/sign-out" method="post" className="mt-4 border-t border-rule pt-3">
+        <div className="mt-4 border-t border-rule pt-3">
+          <Link
+            href="/account"
+            onClick={() => document.getElementById("account-menu")?.hidePopover()}
+            className={`-mx-2 flex h-10 w-[calc(100%+1rem)] items-center gap-2 rounded-lg px-2 text-small font-medium text-ink hover:bg-ink/5 pointer-coarse:h-11 ${ring}`}
+          >
+            <KeyRound className="size-4 text-ink-2" aria-hidden="true" />
+            Change password
+          </Link>
+        </div>
+        <form action="/auth/sign-out" method="post" className="mt-1">
           <button type="submit" className={`-mx-2 flex h-10 w-[calc(100%+1rem)] items-center gap-2 rounded-lg px-2 text-small font-medium text-ink hover:bg-ink/5 pointer-coarse:h-11 ${ring}`}>
             <LogOut className="size-4 text-ink-2" aria-hidden="true" />
             Sign out

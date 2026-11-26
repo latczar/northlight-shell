@@ -1,56 +1,52 @@
 import { test, expect, webkit, type Page } from "@playwright/test";
 
-async function signIn(page: Page, email: string, code: string) {
+async function signIn(page: Page, email: string, password: string) {
   await page.goto("/sign-in");
   await page.getByLabel("Email", { exact: true }).fill(email);
-  await page.getByRole("button", { name: "Email me a code" }).click();
-  await page.locator('input[autocomplete="one-time-code"]').fill(code);
+  await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/c\/kestrel$/);
 }
 
 const desk = "/c/kestrel/iris?tab=requests";
 
-test("sign-in keeps the email and code through connection loss", async ({ page, context }) => {
+test("sign-in keeps the email and password through connection loss", async ({ page, context }) => {
   await page.goto("/sign-in");
   const email = page.getByLabel("Email", { exact: true });
+  const password = page.getByLabel("Password", { exact: true });
   await email.fill("alex@kestrel.example");
-  await context.setOffline(true);
-  await page.getByRole("button", { name: "Email me a code" }).click();
-  await expect(page.getByText(/connection interrupted/i)).toBeVisible();
-  await expect(email).toHaveValue("alex@kestrel.example");
-
-  await context.setOffline(false);
-  await page.getByRole("button", { name: "Email me a code" }).click();
-  const code = page.getByLabel("Code", { exact: true });
-  await code.fill("222222");
+  await password.fill("alex-test-pass");
   await context.setOffline(true);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page.getByText(/reconnect and try again/i)).toBeVisible();
-  await expect(code).toHaveValue("222222");
+  await expect(email).toHaveValue("alex@kestrel.example");
+  await expect(password).toHaveValue("alex-test-pass");
 
   await context.setOffline(false);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/c\/kestrel$/);
 });
 
-test("staff can enter a received code in a new mobile tab without requesting another", async ({ baseURL }) => {
+test("a wrong password and an unknown email get the same answer", async ({ page }) => {
+  await page.goto("/sign-in");
+  for (const [email, password] of [["alex@kestrel.example", "not-the-password"], ["nobody@kestrel.example", "alex-test-pass"]]) {
+    await page.getByLabel("Email", { exact: true }).fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(page.getByText("That email and password don’t match. Check them and try again.")).toBeVisible();
+    await expect(page).toHaveURL(/\/sign-in$/);
+  }
+});
+
+test("staff can sign in on a small phone and land on the desk they asked for", async ({ baseURL }) => {
   const browser = await webkit.launch();
   try {
     const phone = await browser.newPage({ baseURL, viewport: { width: 320, height: 568 }, isMobile: true });
     await phone.goto("/sign-in?next=" + encodeURIComponent(desk));
     await expect(phone.getByRole("heading", { level: 1, name: "Sign in" })).toBeVisible();
-    await expect(phone.getByRole("button", { name: "I already have a code" })).toBeInViewport({ ratio: 1 });
+    await expect(phone.getByRole("button", { name: "Sign in", exact: true })).toBeInViewport({ ratio: 1 });
     await phone.getByLabel("Email", { exact: true }).fill("alex@kestrel.example");
-    const posts: string[] = [];
-    phone.on("request", request => {
-      if (request.method() === "POST") posts.push(request.url());
-    });
-    await phone.getByRole("button", { name: "I already have a code" }).click();
-    const code = phone.getByLabel("Code", { exact: true });
-    await expect(code).toBeVisible();
-    expect(posts).toEqual([]);
-    await code.fill("222222");
+    await phone.getByLabel("Password", { exact: true }).fill("alex-test-pass");
     await phone.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(phone).toHaveURL(new URL(desk, baseURL).href);
     await expect(phone.getByRole("button", { name: /^Chat with Iris$/ })).toBeVisible();
@@ -60,12 +56,39 @@ test("staff can enter a received code in a new mobile tab without requesting ano
   }
 });
 
+test("staff can change their own password and sign in with the new one", async ({ page }) => {
+  await signIn(page, "jamie@kestrel.example", "jamie-test-pass");
+  await page.getByRole("button", { name: /^Account:/ }).click();
+  await page.getByRole("link", { name: "Change password" }).click();
+  await expect(page).toHaveURL(/\/account$/);
+  await page.getByLabel("New password", { exact: true }).fill("short");
+  await page.getByLabel("Type it again", { exact: true }).fill("short");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await expect(page.getByText("Use at least 10 characters.", { exact: true })).toBeVisible();
+  await page.getByLabel("New password", { exact: true }).fill("jamie-new-pass-2");
+  await page.getByLabel("Type it again", { exact: true }).fill("jamie-new-pass-3");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await expect(page.getByText("The two passwords don’t match.")).toBeVisible();
+  await page.getByLabel("Type it again", { exact: true }).fill("jamie-new-pass-2");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await expect(page.getByText("Password changed. Use it next time you sign in.")).toBeVisible();
+
+  await page.context().clearCookies();
+  await signIn(page, "jamie@kestrel.example", "jamie-new-pass-2");
+  // put the shared fake account back for the other tests
+  await page.goto("/account");
+  await page.getByLabel("New password", { exact: true }).fill("jamie-test-pass");
+  await page.getByLabel("Type it again", { exact: true }).fill("jamie-test-pass");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await expect(page.getByText("Password changed. Use it next time you sign in.")).toBeVisible();
+});
+
 test("staff request changes on desktop and approve the same revision on mobile", async ({ page, baseURL }, info) => {
   const mobile = await webkit.launch();
   try {
     const phone = await mobile.newPage({ baseURL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-    await signIn(page, "alex@kestrel.example", "222222");
-    await signIn(phone, "alex@kestrel.example", "222222");
+    await signIn(page, "alex@kestrel.example", "alex-test-pass");
+    await signIn(phone, "alex@kestrel.example", "alex-test-pass");
     await page.goto(desk);
     const original = page.locator("#request-appr-kestrel-1");
     const feedback = "Keep Milbrook and end with how to contact the garage.";
@@ -95,7 +118,7 @@ test("staff request changes on desktop and approve the same revision on mobile",
 });
 
 test("a staff member without a handset assignment cannot open call history", async ({ page }) => {
-  await signIn(page, "jamie@kestrel.example", "333333");
+  await signIn(page, "jamie@kestrel.example", "jamie-test-pass");
   await page.goto(desk);
   await expect(page.getByRole("link", { name: "Call history" })).toHaveCount(0);
   await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
@@ -103,13 +126,10 @@ test("a staff member without a handset assignment cannot open call history", asy
   expect(response?.status()).toBe(404);
 });
 
-test("accepts an autofilled email and code when the browser sends no change event", async ({ page }) => {
+test("accepts an autofilled email and password when the browser sends no change event", async ({ page }) => {
   await page.goto("/sign-in");
-  const email = page.getByLabel("Email", { exact: true });
-  await email.evaluate(input => { (input as HTMLInputElement).value = "jamie@kestrel.example"; });
-  await page.getByRole("button", { name: "Email me a code" }).click();
-  const code = page.locator('input[autocomplete="one-time-code"]');
-  await code.evaluate(input => { (input as HTMLInputElement).value = "333333"; });
+  await page.getByLabel("Email", { exact: true }).evaluate(input => { (input as HTMLInputElement).value = "jamie@kestrel.example"; });
+  await page.getByLabel("Password", { exact: true }).evaluate(input => { (input as HTMLInputElement).value = "jamie-test-pass"; });
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/c\/kestrel$/);
 });
@@ -119,9 +139,9 @@ test("a failed staff job can be retried and finished from another device", async
   const peer = await browser.newPage({ baseURL });
   try {
     const phone = await mobile.newPage({ baseURL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-    await signIn(page, "alex@kestrel.example", "222222");
-    await signIn(phone, "alex@kestrel.example", "222222");
-    await signIn(peer, "jamie@kestrel.example", "333333");
+    await signIn(page, "alex@kestrel.example", "alex-test-pass");
+    await signIn(phone, "alex@kestrel.example", "alex-test-pass");
+    await signIn(peer, "jamie@kestrel.example", "jamie-test-pass");
     const chat = "/c/kestrel/iris?chat=1";
     const failed = "Migration check: fail the first inspection.";
     const retry = "Please try the homepage inspection again.";
@@ -167,9 +187,9 @@ for (const device of ["desktop", "mobile"]) {
     const mobile = device === "mobile" ? await webkit.launch() : null;
     const path = "/c/kestrel/iris/calls";
     try {
-      for (const [email, code, own, other] of [
-        ["admin@northlight.example", "111111", "Services alpha alignment", "Services beta brakes"],
-        ["alex@kestrel.example", "222222", "Services beta brakes", "Services alpha alignment"],
+      for (const [email, password, own, other] of [
+        ["admin@northlight.example", "admin-test-pass", "Services alpha alignment", "Services beta brakes"],
+        ["alex@kestrel.example", "alex-test-pass", "Services beta brakes", "Services alpha alignment"],
       ]) {
         const page = await (mobile ?? browser).newPage({
           baseURL, viewport: { width: mobile ? 375 : 1280, height: 812 }, isMobile: Boolean(mobile),
@@ -177,8 +197,7 @@ for (const device of ["desktop", "mobile"]) {
         try {
           await page.goto("/sign-in?next=" + encodeURIComponent(path));
           await page.getByLabel("Email", { exact: true }).fill(email);
-          await page.getByRole("button", { name: "I already have a code" }).click();
-          await page.getByLabel("Code", { exact: true }).fill(code);
+          await page.getByLabel("Password", { exact: true }).fill(password);
           await page.getByRole("button", { name: "Sign in", exact: true }).click();
           await expect(page).toHaveURL(new URL(path, baseURL).href);
           const call = page.locator("details");
@@ -219,7 +238,7 @@ test("a call draft survives concurrent creation, desktop feedback and mobile app
   const phone = await ios.newPage({baseURL,viewport:{width:375,height:812},isMobile:true,hasTouch:true});
   const history = "/c/kestrel/iris/calls";
   try {
-    await Promise.all([signIn(pc,"alex@kestrel.example","222222"),signIn(phone,"alex@kestrel.example","222222")]);
+    await Promise.all([signIn(pc,"alex@kestrel.example","alex-test-pass"),signIn(phone,"alex@kestrel.example","alex-test-pass")]);
     for (const page of [pc,phone]) {
       await page.goto(history);
       await page.locator("summary").click();
@@ -285,7 +304,7 @@ test("a call draft survives concurrent creation, desktop feedback and mobile app
 });
 
 test("a direct link to a call about hours cannot start a Services draft", async ({ page }) => {
-  await signIn(page, "alex@kestrel.example", "222222");
+  await signIn(page, "alex@kestrel.example", "alex-test-pass");
   const response = await page.goto("/c/kestrel/iris/calls/conv_hours/draft");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("button", { name: "Create draft" })).toHaveCount(0);
@@ -295,7 +314,7 @@ test("an interrupted mobile search keeps a matching call and retries the missing
   const ios = await webkit.launch();
   try {
     const page = await ios.newPage({ baseURL, viewport: { width: 375, height: 812 }, isMobile: true });
-    await signIn(page, "alex@kestrel.example", "222222");
+    await signIn(page, "alex@kestrel.example", "alex-test-pass");
     const cursor = "interrupted-" + Date.now();
     await page.goto("/c/kestrel/iris/calls?topic=Services&cursor=" + cursor);
     const warning = page.getByRole("alert").filter({ hasText: "Some older calls could not be loaded." });
@@ -316,7 +335,7 @@ test("retains both rounds of feedback after a second revision is approved", asyn
   const secondFeedback = "Keep Milbrook and preserve the design.";
   try {
     const phone = await mobile.newPage({ baseURL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-    await Promise.all([signIn(page, "alex@kestrel.example", "222222"), signIn(phone, "alex@kestrel.example", "222222")]);
+    await Promise.all([signIn(page, "alex@kestrel.example", "alex-test-pass"), signIn(phone, "alex@kestrel.example", "alex-test-pass")]);
     await page.goto(path);
     await page.getByRole("button", { name: "Create draft" }).click();
     for (const [device, feedback] of [[page, firstFeedback], [phone, secondFeedback]] as const) {
@@ -344,27 +363,19 @@ test("retains both rounds of feedback after a second revision is approved", asyn
   } finally { await mobile.close(); }
 });
 
-test("mobile staff can resend after returning from their email app and recover from a wrong code", async ({ baseURL }) => {
+test("mobile staff recover from a wrong password and land on the page they asked for", async ({ baseURL }) => {
   const mobile = await webkit.launch();
   try {
     const page = await mobile.newPage({ baseURL, viewport: { width: 375, height: 812 }, isMobile: true });
     const path = "/c/kestrel/iris/calls?topic=Services";
-    await page.clock.install();
     await page.goto("/sign-in?next=" + encodeURIComponent(path));
     await page.getByLabel("Email", { exact: true }).fill("alex@kestrel.example");
-    await page.getByRole("button", { name: "Email me a code" }).click();
-    await expect(page.getByText(/Resend available in/)).toBeVisible();
-    // A parked tab can miss every timer interval while its user reads their email.
-    await page.clock.fastForward(65_000);
-    const resend = page.getByRole("button", { name: "Send a new code" });
-    await expect(resend).toBeVisible({ timeout: 3000 });
-    await resend.click();
-    await expect(page.getByText(/Resend available in/)).toBeVisible();
-    const code = page.getByLabel("Code", { exact: true });
-    await code.fill("000000");
+    const password = page.getByLabel("Password", { exact: true });
+    await password.fill("alex-wrong-pass");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
-    await expect(page.getByText(/That code is wrong or has expired/)).toBeVisible();
-    await code.fill("222222");
+    await expect(page.getByText(/That email and password don’t match/)).toBeVisible();
+    await expect(password).toBeFocused();
+    await password.fill("alex-test-pass");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(page).toHaveURL(new URL(path, baseURL).href);
   } finally { await mobile.close(); }
@@ -375,7 +386,7 @@ test("desktop and mobile can search past an unavailable transcript", async ({ pa
   try {
     const mobile = await ios.newPage({ baseURL, viewport: { width: 375, height: 812 }, isMobile: true });
     for (const device of [page, mobile]) {
-      await signIn(device, "alex@kestrel.example", "222222");
+      await signIn(device, "alex@kestrel.example", "alex-test-pass");
       const path = "/c/kestrel/iris/calls?topic=Services&day=2027-01-15&cursor=";
       await device.goto(path + "partial-detail");
       const retry = device.getByRole("link", { name: "Try again" });
@@ -398,7 +409,7 @@ test("retrying a saved draft reads the call again after a provider outage", asyn
   try {
     const mobile = await ios.newPage({ baseURL, viewport: { width: 390, height: 844 }, isMobile: true });
     for (const [device, id] of [[page, "conv_retry_desktop"], [mobile, "conv_retry_mobile"]] as const) {
-      await signIn(device, "alex@kestrel.example", "222222");
+      await signIn(device, "alex@kestrel.example", "alex-test-pass");
       const path = "/c/kestrel/iris/calls/" + id + "/draft";
       await device.goto(path);
       await device.getByRole("button", { name: "Try again" }).click();
@@ -415,7 +426,7 @@ test("a saved draft returns staff to the exact source even outside the first His
     const mobile = await ios.newPage({ baseURL, viewport: { width: 375, height: 812 }, isMobile: true });
     const history = "/c/kestrel/iris/calls";
     for (const device of [page, mobile]) {
-      await signIn(device, "alex@kestrel.example", "222222");
+      await signIn(device, "alex@kestrel.example", "alex-test-pass");
       await device.goto(history + "/conv_archived_source/draft");
       await device.getByRole("link", { name: "Back to call history" }).click();
       await expect(device.locator("#conv_archived_source ol")).toBeVisible();

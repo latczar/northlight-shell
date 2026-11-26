@@ -10,7 +10,7 @@ The demo business is Kestrel Garage, a fictional independent garage (Iris, its w
 
 ```mermaid
 flowchart LR
-  person[Person in a browser] -->|email + 6-digit code| app[This app on Vercel]
+  person[Person in a browser] -->|email + password| app[This app on Vercel]
   app -->|sign-in, agent_access| supabase[(Supabase: Northlight project)]
   app -->|signed passes per person| brain[agent Worker]
   app -->|approver and manager lists, signed| brain
@@ -75,23 +75,39 @@ Make each value with `openssl rand -hex 32` (the brain refuses approver keys sho
      still works), keep **Confirm email** on, and leave Email the only provider (no anonymous, phone or social sign-in).
      Northlight admin rights come from the sign-in email in `AGENT_ADMINS`, so nobody may be able to make an account for an
      address they do not own.
-   - Email: set up custom SMTP (for example Resend). Supabase's own mail only reaches the project's team, a few an hour.
-     Set the email code to expire after 600 seconds.
-   - Email templates, Magic Link: include `{{ .Token }}`; that is the 6-digit code people type. A link in the same email
-     is optional; if you keep one, point it at `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+   - Passwords: minimum length 10 (`supabase/config.toml` sets this; push it with `npx supabase config push`). People
+     sign in with an email and password. Nothing is emailed, so no SMTP set-up is needed.
    - URL configuration: Site URL is the app's address; add `https://<app address>/auth/confirm` to the redirect URLs.
 2. **Agent.** Set the four Kestrel Garage secrets above on the agent Worker. `clients/kestrel/client.json` already names
    them and sets `accessSigningEnv`, so app rights come only from the lists this app sends.
 3. **Vercel.** Import this repository with `console` as the root directory, Node 22, set every name in `.env.example`
    that you use, add the domain.
 4. **First admin.** Put your email in `AGENT_ADMINS`, create your account in Supabase (Authentication, Users, Add user,
-   auto-confirm), sign in, and add the business's people on **People**.
+   with a password, auto-confirm), sign in, and add the business's people on **People**. Adding a person sets the
+   password they sign in with; give it to them yourself. Anyone can change their own under **Change password** in the
+   account menu, and an admin can set a new one from Change in a person's row if they forget it.
 
-### Iris call history
+### Talking to Iris and call history
 
-Optional: the demo runs on web chat alone, and without these settings call history stays hidden.
+Optional: the demo runs on web chat alone, and without these settings calls and call history stay hidden.
 
-To show Iris's phone calls, set the server-only ElevenLabs conversation-read key in `IRIS_CALL_HISTORY_KEY`, the voice
+**Browser calls.** Staff with access to Kestrel Garage's Iris can talk to Iris through their microphone: **Talk to Iris**
+on the desk opens `/c/kestrel/iris/talk`. ElevenLabs does the listening and speaking; every answer comes from the agent's
+`/v1/chat/completions` as Iris, with the person's own memory, approvals and dashboard. To set it up:
+
+1. Make a free ElevenLabs account and an API key with **ElevenLabs Agents: Write** (everything else: no access).
+2. In your own terminal, from `agent/`, set `ELEVENLABS_API_KEY` and run `node scripts/elevenlabs-iris.mjs`. It makes a
+   private voice agent that answers from the agent Worker, stores the client token in ElevenLabs as a workspace secret,
+   and prints the voice agent's id.
+3. Set `IRIS_CALL_HISTORY_KEY` (the key, secret), `IRIS_CALL_AGENT_ID` (the id) and `IRIS_CALL_BROWSER=on`, then
+   redeploy.
+
+The voice agent is private: only this app's server can open a call (a one-time token), for a signed-in person who may
+use Iris. Each call carries a pass signed for that person (30 minutes), so the agent answers for them alone, and
+**Call history** shows a person only the browser calls that carry their own pass. A call ends after 5 minutes.
+ElevenLabs' free plan includes 15 minutes of calls a month.
+
+**Phone calls.** To show Iris's phone calls, set the server-only ElevenLabs conversation-read key in `IRIS_CALL_HISTORY_KEY`, the voice
 agent's `IRIS_CALL_AGENT_ID` and `IRIS_CALL_BRANCH_ID`, and Iris's line in `IRIS_CALL_LINE` (E.164, with an optional
 `IRIS_CALL_LINE_LABEL` for display). Grant the staff member access to Kestrel Garage's Iris. Staff open **Call history**
 on Iris's desk.
@@ -106,12 +122,13 @@ Example with fictional values:
 
 ## Known limits
 
-- **Sign-in codes** are limited only by Supabase's own rate limits. Every request reaches Supabase from this app's
+- **Password tries** are limited only by Supabase's own rate limits. Every request reaches Supabase from this app's
   server, so Supabase most likely counts those limits per server address rather than per visitor (not tested), and the
-  app keeps no count of wrong codes per address yet.
-- **Who has an account** is not in the words of a code request's answer (no account, a sent code and a per-address
-  limit read the same), and every answer takes at least 1.2 seconds. A code send slower than that still shows in the
-  timing, and an unexpected Supabase failure answers with its own words.
+  app keeps no count of wrong passwords per address yet.
+- **Who has an account** is not in the words of a refused sign-in (a wrong password and an unknown email read the
+  same), but the answer's timing may still differ slightly.
+- **Forgotten passwords** are reset by an admin on People. There is no emailed reset link, because Supabase's free
+  mail only reaches the project's own team.
 - **Sending the access lists** is tried up to three times, a second or so apart. If the brain still does not take them,
   People shows it and offers Send again, and the brain keeps its older lists. This app checks every decision against
   the current access itself. For a person whose access changed anywhere in the business, it starts no new job and

@@ -5,19 +5,14 @@ project_id = "northlight-console"
 
 [auth]
 enabled = true
-# Supabase's default (free) email sends a link that returns here; /auth/confirm finishes the sign-in.
 site_url = "https://northlight-console-ten.vercel.app/auth/confirm"
 additional_redirect_urls = ["https://northlight-console-ten.vercel.app/auth/confirm"]
-# Staff accounts are created by an admin. Nobody can sign themselves up.
+# Staff accounts are created by an admin on the People page, with a password. Nobody can sign themselves up.
 enable_signup = false
+# Matches MIN_PASSWORD in src/lib/password.ts.
+minimum_password_length = 10
 
 [auth.email]
+# Email and password sign-in. Nothing is emailed: admins set passwords on the People page.
 enabled = true
 enable_confirmations = true
-otp_length = 6
-otp_expiry = 600
-
-# Needs custom SMTP on the free plan. Uncomment once SMTP is set.
-# [auth.email.template.magic_link]
-# subject = "Your Northlight sign-in code"
-# content_path = "./supabase/templates/magic_link.html"

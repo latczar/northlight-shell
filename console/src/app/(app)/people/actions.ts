@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { configuredClients } from "@/lib/server/config";
-import { addPerson, PeopleError, pushAccess, savePersonAccess, type EmployeeAccess } from "@/lib/server/people";
+import { passwordProblem } from "@/lib/password";
+import { addPerson, PeopleError, pushAccess, savePersonAccess, setPersonPassword, type EmployeeAccess } from "@/lib/server/people";
 import { actionViewer } from "@/lib/server/session";
 
 export type PeopleResult = { ok: true; pushError: string | null } | { ok: false; error: string };
@@ -30,17 +31,25 @@ const rowsOf = (raw: unknown): EmployeeAccess[] =>
         .map(r => ({ agentId: r.agentId, canApprove: r.canApprove === true, canManage: r.canManage === true }))
     : [];
 
-export async function addPersonAction(clientId: string, email: string, name: string, rows: EmployeeAccess[]): Promise<PeopleResult> {
-  return asAdmin(clientId, actorId => addPerson(actorId, clientId, String(email ?? ""), String(name ?? ""), rowsOf(rows)));
+export async function addPersonAction(clientId: string, email: string, name: string, password: string, rows: EmployeeAccess[]): Promise<PeopleResult> {
+  return asAdmin(clientId, actorId => addPerson(actorId, clientId, String(email ?? ""), String(name ?? ""), String(password ?? ""), rowsOf(rows)));
 }
 
 // The person's changedAt as the page showed it, so a stale page refuses instead of undoing a newer change.
 const seenAt = (raw: unknown): string | undefined => (typeof raw === "string" && !Number.isNaN(Date.parse(raw)) ? raw : undefined);
 
-export async function savePersonAction(clientId: string, userId: string, rows: EmployeeAccess[], changedAt: string): Promise<PeopleResult> {
+/** Saves one person's access and, when `password` is filled in, gives them that new password (checked before anything is saved). */
+export async function savePersonAction(clientId: string, userId: string, rows: EmployeeAccess[], changedAt: string, password = ""): Promise<PeopleResult> {
   const expected = seenAt(changedAt);
   if (!/^[0-9a-f-]{36}$/i.test(String(userId)) || !expected) return { ok: false, error: "This person was not found. Refresh the page." };
-  return asAdmin(clientId, actorId => savePersonAccess(actorId, clientId, userId, rowsOf(rows), { changedAt: expected }));
+  const newPassword = String(password ?? "");
+  const weak = newPassword ? passwordProblem(newPassword) : null;
+  if (weak) return { ok: false, error: `New password: ${weak}` };
+  return asAdmin(clientId, async actorId => {
+    const saved = await savePersonAccess(actorId, clientId, userId, rowsOf(rows), { changedAt: expected });
+    if (newPassword) await setPersonPassword(clientId, userId, newPassword);
+    return saved;
+  });
 }
 
 export async function removePersonAction(clientId: string, userId: string, changedAt: string): Promise<PeopleResult> {

@@ -3,8 +3,8 @@ import { safeNext } from "@/lib/safe-next";
 import { supabaseServer } from "@/lib/server/supabase";
 
 /**
- * Finishes a sign-in link, for an email template that also carries one (the 6-digit code is the main way in, typed on
- * /sign-in): `token_hash` + `type`, or Supabase's PKCE `code`. Either way, only same-site `next` paths.
+ * Finishes a sign-in link, should an email ever carry one (email and password on /sign-in is the way in):
+ * `token_hash` + `type`, or Supabase's PKCE `code`. Either way, only same-site `next` paths.
  */
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;

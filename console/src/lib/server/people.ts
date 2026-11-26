@@ -1,6 +1,7 @@
 import "server-only";
 import { setTimeout as wait } from "node:timers/promises";
 import { AGENT_ID } from "@/lib/access";
+import { passwordProblem } from "@/lib/password";
 import { BrainError, putApprovers, readAgents } from "./brain";
 import { supabaseAdmin } from "./supabase";
 
@@ -171,32 +172,60 @@ export async function brainHasAccess(userId: string, clientId: string): Promise<
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,63}$/;
 
 /**
- * Gives a person access by email: their existing sign-in account, or a new one made confirmed (they prove the address when
- * they sign in with the emailed code). The account records which admin added it in app metadata, which only the server
- * can write. Accounts are never deleted here.
+ * Gives a person access by email, with the password they will sign in with: a new sign-in account made confirmed, or their
+ * existing account with its password replaced (only once the access is saved). The account records which admin added it in
+ * app metadata, which only the server can write. Accounts are never deleted here.
  */
-export async function addPerson(actorId: string, clientId: string, emailRaw: string, nameRaw: string, rows: EmployeeAccess[]): Promise<{ userId: string; pushError: string | null }> {
+export async function addPerson(actorId: string, clientId: string, emailRaw: string, nameRaw: string, passwordRaw: string, rows: EmployeeAccess[]): Promise<{ userId: string; pushError: string | null }> {
   const email = emailRaw.trim().toLowerCase();
   const name = nameRaw.trim().slice(0, 80);
+  const password = String(passwordRaw ?? "");
   if (!EMAIL.test(email)) throw new PeopleError("Enter a full email address, like alex@example.com.");
+  const weak = passwordProblem(password);
+  if (weak) throw new PeopleError(`Password: ${weak}`);
   if (!rows.length) throw new PeopleError("Choose at least one employee this person may use.");
   await checkedRows(clientId, rows);
   const admin = supabaseAdmin();
   const found = await admin.rpc("access_user_id_for_email", { p_email: email });
   if (found.error) fail("look up the email", found.error);
   let userId = found.data as string | null;
+  // an account made here already has the password; one that existed gets it once the access is saved
+  let existing = Boolean(userId);
   if (!userId) {
     const created = await admin.auth.admin.createUser({
-      email, email_confirm: true, app_metadata: { northlight_added_by: actorId, ...(name ? { full_name: name } : {}) },
+      email, password, email_confirm: true, app_metadata: { northlight_added_by: actorId, ...(name ? { full_name: name } : {}) },
     });
     if (created.data.user) userId = created.data.user.id;
     else if (created.error?.code === "email_exists") {
-      // Someone added the same email a moment ago: use that account.
+      // Someone added the same email a moment ago: use that account (its password is set below, like any existing one).
       const again = await admin.rpc("access_user_id_for_email", { p_email: email });
       userId = (again.data as string | null) ?? null;
-    }
+      existing = true;
+    } else if (created.error?.code === "weak_password") throw new PeopleError("Password: choose a longer or less common one.");
     if (!userId) fail("create the sign-in account", created.error);
   }
   const { pushError } = await savePersonAccess(actorId, clientId, userId, rows, "new");
+  if (existing) {
+    try {
+      await replacePassword(userId, password);
+    } catch {
+      throw new PeopleError(`${email} has access now, but the password was not set. Use Change in their row to set it.`);
+    }
+  }
   return { userId, pushError };
+}
+
+/** Sets a new password for someone with access to this client (the admin's "Forgotten password" answer). */
+export async function setPersonPassword(clientId: string, userId: string, passwordRaw: string): Promise<{ pushError: string | null }> {
+  const weak = passwordProblem(String(passwordRaw ?? ""));
+  if (weak) throw new PeopleError(`Password: ${weak}`);
+  if (!(await listPeople(clientId)).some(p => p.userId === userId)) throw new PeopleError("This person was not found. Refresh the page.");
+  await replacePassword(userId, String(passwordRaw));
+  return { pushError: null };
+}
+
+async function replacePassword(userId: string, password: string): Promise<void> {
+  const { error } = await supabaseAdmin().auth.admin.updateUserById(userId, { password });
+  if (error?.code === "weak_password") throw new PeopleError("Password: choose a longer or less common one.");
+  if (error) fail("set the password", error);
 }

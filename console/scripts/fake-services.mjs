@@ -40,13 +40,13 @@ function verifyPass(key, clientId, pass, purpose) {
 
 // ---- People: fake Supabase users. Accounts created through the admin API are added to the same list.
 const SEED = [
-  ["admin", "00000000-0000-4000-8000-000000000001", "admin@northlight.example", "Northlight Admin", "111111"],
-  ["manager", "00000000-0000-4000-8000-000000000002", "alex@kestrel.example", "Alex Morgan", "222222"],
-  ["viewer", "00000000-0000-4000-8000-000000000003", "jamie@kestrel.example", "Jamie Ford", "333333"],
-  ["stranger", "00000000-0000-4000-8000-000000000004", "someone@else.example", "Someone Else", "444444"],
+  ["admin", "00000000-0000-4000-8000-000000000001", "admin@northlight.example", "Northlight Admin", "admin-test-pass"],
+  ["manager", "00000000-0000-4000-8000-000000000002", "alex@kestrel.example", "Alex Morgan", "alex-test-pass"],
+  ["viewer", "00000000-0000-4000-8000-000000000003", "jamie@kestrel.example", "Jamie Ford", "jamie-test-pass"],
+  ["stranger", "00000000-0000-4000-8000-000000000004", "someone@else.example", "Someone Else", "someone-test-pass"],
 ];
 // names an admin gave live in app metadata, as addPerson writes them; a person cannot change those
-const USERS = SEED.map(([key, id, email, name, code]) => ({ key, id, email, meta: {}, app: { full_name: name }, code, createdAt: START, confirmedAt: START }));
+const USERS = SEED.map(([key, id, email, name, password]) => ({ key, id, email, meta: {}, app: { full_name: name }, password, createdAt: START, confirmedAt: START }));
 const user = key => USERS.find(u => u.key === key);
 const userById = id => USERS.find(u => u.id === id);
 const userByEmail = email => typeof email === "string" ? USERS.find(u => u.email.toLowerCase() === email.toLowerCase()) : undefined;
@@ -76,25 +76,32 @@ async function auth(req, res, url) {
     const u = userFromToken(bearer(req));
     return u ? json(res, 200, userJson(u)) : authError(res, 401, "bad_jwt", "invalid JWT");
   }
-  if (post && path === "/otp") {
-    const u = userByEmail((await readJson(req))?.email);
-    if (!u) return authError(res, 422, "otp_disabled", "Signups not allowed for otp");
-    console.log(`[fake auth] code for ${u.email}: ${u.code}`);
-    return json(res, 200, {});
+  if (req.method === "PUT" && path === "/user") {
+    const u = userFromToken(bearer(req));
+    if (!u) return authError(res, 401, "bad_jwt", "invalid JWT");
+    const body = await readJson(req);
+    if (typeof body?.password === "string") {
+      if (body.password.length < 10) return authError(res, 422, "weak_password", "Password should be at least 10 characters.");
+      if (same(body.password, u.password)) return authError(res, 422, "same_password", "New password should be different from the old password.");
+      u.password = body.password;
+    }
+    return json(res, 200, userJson(u));
   }
   if (post && path === "/verify") {
+    // sign-in links (/auth/confirm): the fake hash names the account
     const body = await readJson(req);
-    if (typeof body?.token_hash === "string") {
-      const u = /^fake-hash-(.+)$/.test(body.token_hash) ? userById(body.token_hash.slice("fake-hash-".length)) : undefined;
-      if (u) return json(res, 200, session(u));
-    } else if (body?.type === "email" || body?.type === "magiclink") {
-      const u = userByEmail(body.email);
-      if (u && typeof body.token === "string" && same(body.token, u.code)) return json(res, 200, session(u));
-    }
-    return authError(res, 403, "otp_expired", "Token has expired or is invalid");
+    const u = typeof body?.token_hash === "string" && /^fake-hash-(.+)$/.test(body.token_hash) ? userById(body.token_hash.slice("fake-hash-".length)) : undefined;
+    return u ? json(res, 200, session(u)) : authError(res, 403, "otp_expired", "Token has expired or is invalid");
   }
   if (post && path === "/token") {
-    const u = url.searchParams.get("grant_type") === "refresh_token" ? userById(String((await readJson(req))?.refresh_token ?? "").replace(/^fake-refresh-/, "")) : undefined;
+    const grant = url.searchParams.get("grant_type");
+    const body = await readJson(req);
+    if (grant === "password") {
+      const u = userByEmail(body?.email);
+      const ok = u && typeof body.password === "string" && typeof u.password === "string" && same(body.password, u.password);
+      return ok ? json(res, 200, session(u)) : authError(res, 400, "invalid_credentials", "Invalid login credentials");
+    }
+    const u = grant === "refresh_token" ? userById(String(body?.refresh_token ?? "").replace(/^fake-refresh-/, "")) : undefined;
     return u ? json(res, 200, session(u)) : authError(res, 400, "refresh_token_not_found", "Invalid Refresh Token");
   }
   if (post && path === "/logout") return empty(res);
@@ -104,8 +111,15 @@ async function auth(req, res, url) {
       const body = await readJson(req);
       if (typeof body?.email !== "string" || !/^[^@\s]+@[^@\s]+$/.test(body.email)) return authError(res, 422, "email_address_invalid", "Unable to validate email address: invalid format");
       if (userByEmail(body.email)) return authError(res, 422, "email_exists", "A user with this email address has already been registered");
-      const u = { id: randomUUID(), email: body.email, meta: body.user_metadata ?? {}, app: body.app_metadata ?? {}, code: "123456", createdAt: Date.now(), confirmedAt: body.email_confirm ? Date.now() : null };
+      const u = { id: randomUUID(), email: body.email, meta: body.user_metadata ?? {}, app: body.app_metadata ?? {}, password: body.password, createdAt: Date.now(), confirmedAt: body.email_confirm ? Date.now() : null };
       USERS.push(u);
+      return json(res, 200, userJson(u));
+    }
+    if (req.method === "PUT" && path.startsWith("/admin/users/")) {
+      const u = userById(decodeURIComponent(path.slice("/admin/users/".length)));
+      if (!u) return authError(res, 404, "user_not_found", "User not found");
+      const body = await readJson(req);
+      if (typeof body?.password === "string") u.password = body.password;
       return json(res, 200, userJson(u));
     }
     const found = req.method === "GET" && path.startsWith("/admin/users/") ? userById(decodeURIComponent(path.slice("/admin/users/".length))) : undefined;
