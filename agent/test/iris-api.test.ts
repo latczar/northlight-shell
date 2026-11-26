@@ -49,42 +49,6 @@ describe("Iris staff app API", () => {
     expect((await SELF.fetch(route, { method: "POST", headers, body: JSON.stringify({ ...body, userAuth: "forged" }) })).status).toBe(401);
   });
 
-  it.each([
-    [true, "fix the homepage", "Ask the manager what should change"],
-    [true, "Preview heading: Milbrook | Auto Shop", "Ask the manager what should change"],
-    [true, "Preview heading: Milbrook | Auto Repair Shop", "KESTREL_PREVIEW_GITHUB_TOKEN"],
-    [true, "Preview heading: Kestrel\u2019s | Auto Repair Shop", "KESTREL_PREVIEW_GITHUB_TOKEN"],
-    [false, "Preview heading: Milbrook | Auto Repair Shop", "signed-in website manager is required"],
-  ] as const)("checks manager access and exact heading consent (%s, %s)", async (manager, text, expected) => {
-    const person = manager ? "staff:manager" : "staff:visitor";
-    const dashboard = env.DASHBOARD.get(env.DASHBOARD.idFromName("kestrel"));
-    await dashboard.setApprovers(1, {}, { "iris": ["staff:manager"] });
-    const conversation = crypto.randomUUID();
-    const stub = env.CONVERSATIONS.get(env.CONVERSATIONS.idFromName("kestrel/iris/" + conversation));
-    await runInDurableObject(stub, instance => {
-      instance.model = {
-        async turn(request) {
-          const tool = request.messages.find(m => m.role === "tool");
-          if (tool) {
-            const result = String(tool.content);
-            request.onText?.(result);
-            return { content: result, toolCalls: [], usage: { inputTokens: 2, outputTokens: 2 } };
-          }
-          return { content: "", toolCalls: [{ id: "build", type: "function", function: {
-            name: "build_homepage_preview", arguments: JSON.stringify({ first: text.includes("Kestrel\u2019s") ? "Kestrel\u2019s" : "Milbrook", second: "Auto Repair Shop" }),
-          } }], usage: { inputTokens: 2, outputTokens: 2 } };
-        },
-      } satisfies ModelAdapter;
-    });
-    const response = await SELF.fetch("https://brain/v1/agents/iris/conversations/" + conversation + "/messages", {
-      method: "POST", headers, body: JSON.stringify({ id: crypto.randomUUID(), text,
-        userAuth: await signUserPass(key, "kestrel", person, expires()) }),
-    });
-    expect(response.status).toBe(200);
-    const stream = await response.text();
-    expect(stream).toContain(expected);
-  });
-
   it("serves a signed Iris voice request as OpenAI-compatible SSE", async () => {
     const conversation = `voice-web:voice-visitor-${crypto.randomUUID()}`;
     await installFake(conversation);

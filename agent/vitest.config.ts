@@ -15,8 +15,6 @@ buildSync({
 
 // Test-only values; real ones live in .dev.vars / desk/.dev.vars or Cloudflare secrets. The desk's names, not the brain's.
 const DESK_SECRETS = {
-  NORTHWIND_RELEASE: "northwind-read-fixture", NORTHWIND_BUILD: "northwind-write-fixture",
-  KESTREL_RELEASE_GITHUB_TOKEN: "kestrel-release-test-only",
   OPENAI_DESK_API_KEY: "test-openai-desk-key", GITHUB_TOKEN: "ghp_desk_test_secret_value",
   R2_MEDIA_ACCESS_KEY_ID: "test-media-access-key-id", R2_MEDIA_SECRET_ACCESS_KEY: "test-media-secret-access-key", R2_MEDIA_ACCOUNT_ID: "testaccount0123",
 };

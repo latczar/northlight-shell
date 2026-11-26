@@ -57,8 +57,6 @@ Brain (`npx wrangler secret put <NAME>`):
 
 Desk (`npx wrangler secret put <NAME> --config desk/wrangler.jsonc`), all optional; each tool reports "not connected" without its key:
 
-- `KESTREL_RELEASE_GITHUB_TOKEN`: read-only on the site repo, for `find_deployed_pull`
-- `KESTREL_PREVIEW_GITHUB_TOKEN`: contents and pull requests write on the site repo, for the two preview tools
 - `PAGESPEED_API_KEY`: raises the PageSpeed quota for `page_audit`
 - `R2_MEDIA_ACCESS_KEY_ID`, `R2_MEDIA_SECRET_ACCESS_KEY`, `R2_MEDIA_ACCOUNT_ID`: sign media upload links
 

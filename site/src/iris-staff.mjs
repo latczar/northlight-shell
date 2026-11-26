@@ -3,7 +3,7 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { renderDesk } from './iris-view.mjs';
 
 const root = '/staff/iris/';
-const acceptedTools = new Set(['submit_seo_copy', 'propose_services_title_preview']);
+const acceptedTools = new Set(['submit_seo_copy']);
 const accessKeys = new Map();
 const headers = {
   'cache-control': 'private, no-store',

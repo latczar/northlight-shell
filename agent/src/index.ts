@@ -1,6 +1,4 @@
 import { servicesCallDraft } from "../agents/iris/call-draft";
-import { buildHomepagePreview } from "../agents/iris/build";
-import { deskClientContext } from "./desk-client";
 import { AGENTS, EDITABLE, SETUP } from "../agents";
 import { CLIENTS } from "../clients";
 import { parseApprovers, verifyAccess } from "./access";
@@ -634,22 +632,6 @@ export default {
       return servicesCallDraft(request, env, client, person.userId, callDraft[1]);
     }
 
-    if (request.method === "POST" && url.pathname === "/v1/agents/iris/homepage-preview") {
-      if (!client.agents.includes("iris") || !client.permissions.includes("website.preview")) return json({ error: "Not found" }, 404);
-      const person = await personFrom(request.headers.get("x-user-pass") ?? "", env, client);
-      if (person instanceof Response) return person;
-      if (!person.userId || !await may(env, client, "manage", person.userId, "iris")) return json({ error: "Website manager access required." }, 403);
-      const body = await request.json().catch(() => null) as { first?: unknown; second?: unknown } | null;
-      if (!body || typeof body.first !== "string" || typeof body.second !== "string") return json({ error: "Provide both heading lines." }, 400);
-      const context = deskClientContext({ desk: env.DESK, state: { presence: {}, ids: {} }, client, agentId: "iris",
-        toolName: "build_homepage_preview", actionId: crypto.randomUUID(), signal: AbortSignal.timeout(60000) });
-      try {
-        const settings = await agentSettings(env, client, "iris");
-        return json(await buildHomepagePreview(context.connection(String(settings.previewConnection)), body.first, body.second, settings));
-      } catch (error) {
-        return json({ error: error instanceof Error ? error.message : "Preview build failed." }, 422);
-      }
-    }
     // The website's approved changes waiting in Preview: publish them to Live, or drop them (src/site-copy.ts).
     // An admin pass, or the approver pass of someone who approves for Iris.
     if (request.method === "POST" && url.pathname === "/v1/agents/iris/site") {

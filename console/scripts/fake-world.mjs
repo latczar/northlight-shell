@@ -9,10 +9,8 @@ export const AGENTS = { "iris": { name: "Iris", role: "Website manager and SEO a
 export const isReady = items => items.every(item => item.connected || item.optional);
 
 const SITE = "https://kestrel-garage.example/";
-const setupItems = (site, releaseMissing, previewMissing) => [
+const setupItems = site => [
   { id: "website", label: "Website to review", kind: "setting", connected: Boolean(site), missing: site ? [] : ["site"], unlocks: site || "Set the website before reviewing pages." },
-  { id: "release_lookup", label: "GitHub release lookup", kind: "secret", optional: true, connected: !releaseMissing.length, missing: releaseMissing, unlocks: "Verify the PR for the live website commit." },
-  { id: "preview_repo", label: "Homepage preview pull requests", kind: "secret", optional: true, connected: !previewMissing.length, missing: previewMissing, unlocks: "Build homepage heading changes for a signed-in website manager." },
 ];
 
 // People ids are passed in so conversation ids and requesters match the fake Supabase users.
@@ -65,11 +63,11 @@ export function buildWorld(now, { admin, manager }) {
   ].map(([role, text], i) => ({ seq: i + 1, role, text }));
 
   return {
-    kestrel: { approvals, cards, lessons, snapshots, setup: setupItems(SITE, [], ["KESTREL_PREVIEW_GITHUB_TOKEN"]), history: { [`web-${manager}`]: history } },
+    kestrel: { approvals, cards, lessons, snapshots, setup: setupItems(SITE), history: { [`web-${manager}`]: history } },
     harbour: {
       approvals: [], lessons: [], snapshots: {}, history: {},
       cards: [card("card-harbour-report", "report", "Sample: First homepage review", "Sample: Iris needs the website address before reviewing pages.", now - day, "scheduled-iris-weekly")],
-      setup: setupItems("", ["HARBOUR_RELEASE_GITHUB_TOKEN"], ["HARBOUR_PREVIEW_GITHUB_TOKEN"]),
+      setup: setupItems(""),
     },
   };
 }

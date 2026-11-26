@@ -42,21 +42,18 @@ describe("GET /v1/agents/:agent/setup", () => {
   const kestrel = CLIENTS.find(c => c.id === "kestrel")!;
   const kestrelAuth = { authorization: "Bearer test-token-kestrel-0123456789abcdef" };
   it("lists what each agent needs by name, never a value", async () => {
-    // Connection keys live in the desk Worker (vitest.config.ts DESK_SECRETS sets the release token there), not the brain.
     const body = await (await SELF.fetch("https://brain/v1/agents/iris/setup", { headers: kestrelAuth })).text();
-    expect(body).not.toContain("kestrel-release-test-only");
     const { ready, items } = JSON.parse(body) as { ready: boolean; items: { id: string; kind: string; connected: boolean; missing: string[]; optional?: boolean }[] };
     expect(ready).toBe(true);
     expect(items.find(i => i.id === "website")).toMatchObject({ kind: "setting", connected: true, missing: [] });
-    expect(items.find(i => i.id === "release_lookup")).toMatchObject({ kind: "secret", connected: true, missing: [], optional: true });
-    expect(items.find(i => i.id === "preview_repo")).toMatchObject({ connected: false, missing: ["KESTREL_PREVIEW_GITHUB_TOKEN"], optional: true });
+    // Iris needs only its website: no GitHub or other keys
+    expect(items.map(i => i.id)).toEqual(["website"]);
   });
 
   it("flips an item to connected once every env var it names is set", () => {
     const setup = (names: string[], settings = kestrel.agentSettings!.iris) => SETUP.iris({ clientId: "kestrel", settings,
       connections: kestrel.connections?.filter(c => c.agents.includes("iris")), has: name => names.includes(name) });
-    expect(setup([]).find(i => i.id === "preview_repo")).toMatchObject({ connected: false, missing: ["KESTREL_PREVIEW_GITHUB_TOKEN"] });
-    expect(setup(["KESTREL_PREVIEW_GITHUB_TOKEN"]).find(i => i.id === "preview_repo")).toMatchObject({ connected: true, missing: [] });
+    expect(setup([]).find(i => i.id === "website")).toMatchObject({ connected: true, missing: [] });
     expect(setup([], { ...kestrel.agentSettings!.iris, site: "" }).find(i => i.id === "website")).toMatchObject({ connected: false, missing: ["site"] });
   });
 

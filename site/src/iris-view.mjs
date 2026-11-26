@@ -11,7 +11,7 @@ function card(item, revised) {
     ${previous ? `<details><summary>${p.previousProposed?'Previous draft':'Current wording'}</summary><p>${escape(previous)}</p></details>` : ''}
     <h4>Proposed wording</h4><blockquote>${escape(p.proposed)}</blockquote>
     ${p.reviewerFeedback || item.reason ? `<p><strong>Staff feedback</strong><br>${escape(p.reviewerFeedback || item.reason)}</p>` : ''}
-    ${pending ? `<p>${editorial?'Approval records this wording.':'Approval opens a draft pull request for separate review.'}</p>
+    ${pending ? `<p>Approval puts this wording on the website’s Preview. Publish it in the Northlight console to make it live.</p>
       <div class="actions"><form method="post" action="${path}"><button name="action" value="approve">Approve</button></form>
       <details><summary>${editorial?'Request changes':'Decline with feedback'}</summary><form method="post" action="${path}"><label>Feedback for Iris<textarea name="feedback" required maxlength="500"></textarea></label><button name="action" value="changes">Send feedback</button></form></details></div>`
     : `<strong>${escape(item.status)}</strong>${editorial && item.status==='declined' && item.reason && !revised ? `<form method="post" action="${path}"><button name="action" value="revise">Retry revision</button></form>` : ''}`}</article>`;

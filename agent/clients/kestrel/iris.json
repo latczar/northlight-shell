@@ -1,26 +1,16 @@
 {
   "permissions": [
     "seo.read",
-    "website.preview",
-    "website.release.read",
     "website.copy.review"
   ],
   "schedules": [],
   "settings": {
     "servicesPagePath": "/services/",
-    "servicesPreviewStaff": [],
-    "confirmHeadingInChat": true,
     "designNotes": "The owner approved the current homepage heading. Preserve it during routine SEO work. Ask staff before proposing a different heading.",
     "businessName": "Kestrel Garage",
     "location": "Milbrook",
     "site": "https://kestrel-garage-site.latczar.workers.dev",
     "timezone": "Europe/London",
-    "repository": "latczar/northlight-shell",
-    "baseBranch": "main",
-    "siteFile": "site/site.json",
-    "reviewer": "latczar",
-    "releaseConnection": "kestrel_release_github",
-    "previewConnection": "kestrel_preview_github",
     "copyLocale": "en-GB",
     "reviewSchedule": "iris-weekly-homepage"
   },
@@ -54,97 +44,6 @@
         {
           "method": "GET",
           "path": "/pagespeedonline/v5/runPagespeed"
-        }
-      ]
-    },
-    {
-      "id": "kestrel_preview_github",
-      "access": "write",
-      "hosts": [
-        "api.github.com"
-      ],
-      "auth": {
-        "type": "bearer",
-        "secret": "KESTREL_PREVIEW_GITHUB_TOKEN"
-      },
-      "headers": {
-        "user-agent": "northlight-agent",
-        "x-github-api-version": "2022-11-28"
-      },
-      "gets": [
-        {
-          "method": "GET",
-          "path": "/repos/latczar/northlight-shell/git/ref/heads/main"
-        },
-        {
-          "method": "GET",
-          "path": "/repos/latczar/northlight-shell/contents/site/site.json"
-        },
-        {
-          "method": "GET",
-          "path": "/repos/latczar/northlight-shell/compare/*"
-        },
-        {
-          "method": "GET",
-          "path": "/repos/latczar/northlight-shell/pulls"
-        },
-        {
-          "method": "GET",
-          "path": "/repos/latczar/northlight-shell/pulls/*/reviews"
-        },
-        {
-          "method": "GET",
-          "path": "/repos/latczar/northlight-shell/commits/*/pulls"
-        }
-      ],
-      "writes": [
-        {
-          "method": "POST",
-          "path": "/repos/latczar/northlight-shell/git/refs",
-          "body": {
-            "ref": "refs/heads/{preview}"
-          }
-        },
-        {
-          "method": "PUT",
-          "path": "/repos/latczar/northlight-shell/contents/site/site.json",
-          "body": {
-            "branch": "{preview}"
-          }
-        },
-        {
-          "method": "POST",
-          "path": "/repos/latczar/northlight-shell/pulls",
-          "body": {
-            "base": "main",
-            "head": "{preview}"
-          }
-        },
-        {
-          "method": "POST",
-          "path": "/repos/latczar/northlight-shell/pulls/*/requested_reviewers",
-          "body": {}
-        }
-      ]
-    },
-    {
-      "id": "kestrel_release_github",
-      "access": "read",
-      "hosts": [
-        "api.github.com"
-      ],
-      "auth": {
-        "type": "bearer",
-        "secret": "KESTREL_RELEASE_GITHUB_TOKEN"
-      },
-      "headers": {
-        "user-agent": "northlight-agent",
-        "x-github-api-version": "2022-11-28"
-      },
-      "gets": [
-        {
-          "method": "GET",
-          "path": "/repos/latczar/northlight-shell/commits/{releaseSha}/pulls"
         }
       ]
     }

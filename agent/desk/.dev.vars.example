@@ -10,9 +10,5 @@ R2_MEDIA_SECRET_ACCESS_KEY=
 R2_MEDIA_ACCOUNT_ID=
 
 # Iris (all optional; each tool reports "not connected" without its key).
-# Fine-grained GitHub token, read-only on the site repo: pull requests for the deployed commit.
-KESTREL_RELEASE_GITHUB_TOKEN=
-# Fine-grained GitHub token, contents and pull requests write on the site repo: homepage and Services title previews.
-KESTREL_PREVIEW_GITHUB_TOKEN=
 # Google PageSpeed. Without it, page_audit uses the low shared quota.
 PAGESPEED_API_KEY=

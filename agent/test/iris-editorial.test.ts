@@ -71,7 +71,7 @@ describe("Iris editorial workflow", () => {
     await dashboard.decide(id, false, "reviewer", "Mention Milbrook first.");
     const parent = await original();
     expect((await requestEditorialRevision(env, client, { ...parent, reason: "" })).status).toBe(409);
-    expect((await requestEditorialRevision(env, client, { ...parent, tool: "build_homepage_preview" })).status).toBe(409);
+    expect((await requestEditorialRevision(env, client, { ...parent, tool: "post_seo_report" })).status).toBe(409);
     const conversationId = "editorial-revision/" + id;
     const conversation = env.CONVERSATIONS.get(env.CONVERSATIONS.idFromName("kestrel/iris/" + conversationId));
     await runInDurableObject(conversation, instance => {

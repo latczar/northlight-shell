@@ -12,7 +12,7 @@ describe("Kestrel's website manager", () => {
     expect(client.agents).toEqual(["iris"]);
     const agent = AGENTS["iris"];
     expect(agent.name).toBe("Iris");
-    expect(agent.tools).toEqual(["my_setup", "current_time", "review_site_page", "page_audit", "build_homepage_preview", "propose_services_title_preview", "find_deployed_pull", "submit_seo_copy", "post_seo_report"]);
+    expect(agent.tools).toEqual(["my_setup", "current_time", "review_site_page", "page_audit", "submit_seo_copy", "post_seo_report"]);
     for (const name of agent.tools) expect(client.permissions).toContain(TOOLS[name].permission);
     expect(client.connections?.filter(c => c.access === "write").every(c => c.id === "kestrel_preview_github")).toBe(true);
   });
