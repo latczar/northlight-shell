@@ -133,7 +133,12 @@ async function send(url: string, request: ModelTurnRequest, auth: Record<string,
     await response.body?.cancel().catch(() => {});
     throw error;
   }
-  if (!response.ok || !response.body) throw new ModelProtocolError(`Model provider returned HTTP ${response.status}.`, response.status);
+  if (!response.ok || !response.body) {
+    // Log the provider's own reason (for example an unknown model or parameter) so a rejected request can be fixed.
+    // The person still sees only the status; provider text is for the operator's logs.
+    if (!response.ok) console.error("model provider rejected request", response.status, await providerReason(response));
+    throw new ModelProtocolError(`Model provider returned HTTP ${response.status}.`, response.status);
+  }
   return response.body;
 }
 
@@ -634,4 +639,15 @@ export async function* sseData(body: ReadableStream<Uint8Array>): AsyncGenerator
       if (data) yield data;
     }
   }
+}
+
+/** The provider's error message from a rejected request, shortened, or a note when the body has none. */
+async function providerReason(response: Response): Promise<string> {
+  const text = await response.text().catch(() => "");
+  try {
+    const parsed = JSON.parse(text) as { error?: { message?: unknown; param?: unknown; code?: unknown } };
+    const { message, param, code } = parsed.error ?? {};
+    if (typeof message === "string") return [message, param && `param: ${String(param)}`, code && `code: ${String(code)}`].filter(Boolean).join(" | ").slice(0, 500);
+  } catch { /* not JSON */ }
+  return text.slice(0, 300) || "no body";
 }

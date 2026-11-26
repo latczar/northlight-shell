@@ -17,15 +17,17 @@
   "dailyCostCapUsd": 5,
   "model": {
     "baseURL": "https://api.openai.com/v1",
+    "api": "responses",
     "model": "gpt-5.4-mini",
     "secretEnv": "OPENAI_API_KEY",
     "inputCostPerMillion": 0.75,
     "outputCostPerMillion": 4.5,
     "maxOutputTokens": 32000,
-    "maxTokensParam": "max_completion_tokens",
     "contextWindowTokens": 128000,
     "extraBody": {
-      "reasoning_effort": "low"
+      "reasoning": {
+        "effort": "low"
+      }
     }
   }
 }
