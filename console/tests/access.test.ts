@@ -38,6 +38,11 @@ describe("clients and admins from settings", () => {
     expect(parseClients(undefined)).toEqual([]);
   });
 
+  it("keeps a client's website only when it is an https address", () => {
+    expect(parseClients(`[{"id":"kestrel","name":"Kestrel Garage","site":"https://kestrel.example"},{"id":"wren","name":"Wren","site":"javascript:alert(1)"},{"id":"harbour","name":"Harbour","site":"http://harbour.example"}]`))
+      .toEqual([{ id: "kestrel", name: "Kestrel Garage", site: "https://kestrel.example" }, { id: "wren", name: "Wren" }, { id: "harbour", name: "Harbour" }]);
+  });
+
   it("shows a person only the clients where they use an employee", () => {
     const access = accessFromRows([row({})]);
     expect(visibleClients(access, clients)).toEqual([{ id: "kestrel", name: "Kestrel Garage" }]);

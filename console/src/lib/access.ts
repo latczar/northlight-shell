@@ -3,6 +3,8 @@
 export interface Client {
   id: string;
   name: string;
+  /** The business's public website, when AGENT_CLIENTS gives one (https only) */
+  site?: string;
 }
 
 export interface Grant {
@@ -43,7 +45,7 @@ export function parseClients(raw: string | undefined): Client[] {
   if (!Array.isArray(list)) return [];
   return list.flatMap(item =>
     item && typeof item.id === "string" && CLIENT_ID.test(item.id) && typeof item.name === "string" && item.name.trim()
-      ? [{ id: item.id, name: item.name.trim() }]
+      ? [{ id: item.id, name: item.name.trim(), ...(typeof item.site === "string" && /^https:\/\/[^\s"'<>]+$/.test(item.site) ? { site: item.site } : {}) }]
       : []);
 }
 

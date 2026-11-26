@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { webkitLoopback } from '../test-support/webkit-loopback.mjs';
+import site from '../site.json' with { type: 'json' };
 
 test.beforeEach(async ({ context, page, browserName }) => {
   await context.route(/^https:\/\//, route => route.abort());
@@ -58,9 +59,9 @@ test('the public Worker keeps the staff dashboard and its review endpoints priva
   expect([404, 405], 'the public website must refuse staff approvals').toContain(response.status());
 });
 
-test('the staff desk is closed until sign-in is configured on the Worker', async ({request}) => {
-  const result = await request.get('/staff/iris/');
-  expect(result.status()).toBe(503);
-  expect(result.headers()['cache-control']).toContain('no-store');
-  expect(await result.text()).toBe('Staff sign-in is being configured.');
+test('until sign-in is configured on the Worker, the staff desk sends staff to the Northlight console', async ({request}) => {
+  const result = await request.get('/staff/iris/', {maxRedirects: 0});
+  expect(result.status()).toBe(302);
+  expect(result.headers()['location']).toBe(site.staff.sign_in);
+  expect(site.staff.sign_in).toMatch(/^https:\/\/[^/]+\/c\/kestrel\/iris$/);
 });

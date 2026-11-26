@@ -15,6 +15,14 @@ import { listAgents } from "@/lib/server/brain";
 import { lookupViewer, requireAgent, requireViewer } from "@/lib/server/session";
 import { loadDesk } from "@/lib/server/workspace";
 
+/** A handset caller gets Iris's line (when one is set); anyone else with call history talks to Iris in the browser. */
+function deskCalls(caller: ReturnType<typeof historyCaller>) {
+  if (!caller) return null;
+  if (caller.phone === null) return { line: null, talk: true };
+  const line = irisLine();
+  return line ? { line, talk: false } : null;
+}
+
 const TABS: DeskTab[] = ["overview", "requests", "setup", "learned"];
 
 /** The employee's name in the browser tab, only for someone who may use the employee (the same check as the page). */
@@ -53,7 +61,7 @@ export default async function DeskPage({ params, searchParams }: { params: Promi
       decisions={decisions}
       proposedLessons={proposedLessons}
       setupReady={!desk.setup.ok || desk.setup.value.ready}
-      pilotLine={historyCaller(viewer.email, client.id, agent.id, viewer.userId) ? irisLine() : null}
+      calls={deskCalls(historyCaller(viewer.email, client.id, agent.id, viewer.userId))}
       initialTab={initialTab}
       initialChat={query.chat === "1"}
       panels={{

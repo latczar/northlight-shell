@@ -874,5 +874,5 @@ body { background: #fafbfd; }
 }
 
 /* Northlight credit in the footer */
-.managed-by { display: flex; align-items: center; gap: 8px; }
+.managed-by { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .managed-by img { width: 16px; height: 16px; }

@@ -31,6 +31,13 @@ Other routes: `GET /health`, `POST /v1/agents/iris/homepage-preview`, `POST /v1/
 
 The `/v1/convai/` calls in the console and site go to ElevenLabs, not to the brain.
 
+## Voice
+
+Calls to Iris use an ElevenLabs voice agent with a custom LLM: ElevenLabs listens and speaks, and sends each turn to `POST /v1/chat/completions` with the client token as its API key and `model: "iris"`. `scripts/elevenlabs-iris.mjs` creates or updates that voice agent (private, with custom LLM extra body allowed).
+
+- Browser calls start in the console (`/c/kestrel/iris/talk`). It asks ElevenLabs for a one-time token and sends `elevenlabs_extra_body: {conversation_id: "voice-<person>-<uuid>", user_auth: <pass>}`, so the call is the signed-in person's, with their memory and approvals.
+- Phone calls need a number from Twilio or a SIP trunk (not free) and `POST /v1/voice/phone-start` as the conversation initiation webhook.
+
 ## Iris
 
 `agents/iris/`: the website manager and SEO agent. Tools:

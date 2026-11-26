@@ -36,6 +36,11 @@ export default async function TeamPage({ params }: { params: Promise<{ client: s
           {team.agents.ok && ` · ${count(agents.length, "AI employee")}`}
           {team.requests.ok && ` · ${decisions.length ? `${count(decisions.length, "request")} ${decisions.length === 1 ? "needs" : "need"} you` : "nothing needs you"}`}
         </p>
+        {client.site && (
+          <a href={client.site} target="_blank" rel="noopener noreferrer" className="self-start text-small font-medium text-ink underline">
+            Visit the {client.name} website<span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        )}
       </header>
 
       <div className="grid items-start gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)]">

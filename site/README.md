@@ -48,6 +48,8 @@ The staff desk only opens behind Cloudflare Access. Until these are set it retur
 | `USER_SIGNING_KEY_KESTREL` | secret | Signs the staff member's chat pass |
 | `APPROVER_SIGNING_KEY_KESTREL` | secret | Signs approval decisions |
 
+The footer links staff to the Northlight console (`staff.sign_in` in `site.json`). Until Cloudflare Access is set up for `/staff/iris` (`IRIS_ACCESS_ISSUER` unset), that path redirects to the console as well.
+
 The Worker reaches the agent through the `AGENT` service binding to the `northlight-agent` Worker. Phone calls are optional: `IRIS_CALL_HISTORY_KEY`, `IRIS_VOICE_AGENT_ID`, `IRIS_VOICE_BRANCH_ID`, `IRIS_PHONE_NUMBER`, `IRIS_PHONE_DISPLAY` and `IRIS_STAFF_HANDSET` turn on call history and the call link.
 
 Set secrets with `npx wrangler secret put <NAME>`. Never commit them; `.dev.vars` is ignored.

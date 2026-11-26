@@ -188,7 +188,7 @@ ${body}
   <div class="footer-base">
     <p>© ${new Date().getFullYear()} ${esc(b.name)} · Serving ${esc(b.county)}</p>
     <p>${esc(site.credits)}</p>
-    <p class="managed-by"><img src="/brand/northlight-mark.svg" width="16" height="16" alt="">Website managed by Northlight</p>
+    <p class="managed-by"><img src="/brand/northlight-mark.svg" width="16" height="16" alt="">Website managed by Northlight${site.staff?.sign_in ? ` · <a href="${url(site.staff.sign_in, "staff.sign_in")}"${ext(site.staff.sign_in)}>Staff sign-in</a>` : ""}</p>
     <nav class="policy-links" aria-label="Policies"><a href="/privacy/">Privacy policy</a><a href="/site-guidelines/">Site guidelines</a><a href="/accessibility/">Accessibility</a></nav>
     ${site.preview.noindex ? `<p class="preview-note">${esc(site.preview.notice)}</p>` : ""}
   </div>

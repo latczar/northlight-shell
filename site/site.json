@@ -38,6 +38,9 @@
     ],
     "url": "https://kestrel-garage.example"
   },
+  "staff": {
+    "sign_in": "https://northlight-console-ten.vercel.app/c/kestrel/iris"
+  },
   "preview": {
     "noindex": true,
     "notice": "Kestrel Garage is a fictional business. This is a demo website, so the contact form does not send."

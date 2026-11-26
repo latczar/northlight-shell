@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle, Phone } from "lucide-react";
 import { Chat } from "@/components/chat/Chat";
 import { Button } from "@/components/ui/Button";
 import { TabPanel, Tabs } from "@/components/ui/Tabs";
@@ -49,7 +49,7 @@ export function Desk({
   decisions,
   proposedLessons,
   setupReady,
-  pilotLine,
+  calls,
   initialTab,
   initialChat,
   panels,
@@ -62,7 +62,8 @@ export function Desk({
   decisions: number;
   proposedLessons: number;
   setupReady: boolean;
-  pilotLine: { number: string; label: string } | null;
+  /** Iris's phone line or browser calls, and the person's call history; null when this person has no calls to Iris */
+  calls: { line: { number: string; label: string } | null; talk: boolean } | null;
   initialTab: DeskTab;
   initialChat: boolean;
   panels: Record<DeskTab, ReactNode>;
@@ -139,11 +140,19 @@ export function Desk({
           >
             {chat ? "Close the chat" : `Chat with ${agent.name}`}
           </Button>
-          {pilotLine && (
+          {calls && (
             <div className="flex flex-col items-start gap-1 text-small">
-              <a href={`tel:${pilotLine.number}`} className="inline-flex min-h-11 flex-col justify-center rounded-sm font-medium text-ink underline">
-                Call Iris <span className="tabular-nums">{pilotLine.label}</span>
-              </a>
+              {calls.line && (
+                <a href={`tel:${calls.line.number}`} className="inline-flex min-h-11 flex-col justify-center rounded-sm font-medium text-ink underline">
+                  Call Iris <span className="tabular-nums">{calls.line.label}</span>
+                </a>
+              )}
+              {calls.talk && (
+                <Link href={`/c/${clientId}/${agent.id}/talk`} prefetch={false} className="inline-flex min-h-11 items-center gap-1.5 rounded-sm font-medium text-ink underline">
+                  <Phone className="size-4" aria-hidden="true" />
+                  Talk to {agent.name}
+                </Link>
+              )}
               <Link href={`/c/${clientId}/${agent.id}/calls`} prefetch={false} className="inline-flex min-h-11 items-center rounded-sm font-medium text-ink underline">
                 Call history
               </Link>
