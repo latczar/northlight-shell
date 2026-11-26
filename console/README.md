@@ -96,11 +96,11 @@ on the desk opens `/c/kestrel/iris/talk`. ElevenLabs does the listening and spea
 `/v1/chat/completions` as Iris, with the person's own memory, approvals and dashboard. To set it up:
 
 1. Make a free ElevenLabs account and an API key with **ElevenLabs Agents: Write** (everything else: no access).
-2. In your own terminal, from `agent/`, set `ELEVENLABS_API_KEY` and run `node scripts/elevenlabs-iris.mjs`. It makes a
+2. In your own terminal, from `agent/`, run `node scripts/elevenlabs-iris.mjs` and paste the key at its hidden prompt. It makes a
    private voice agent that answers from the agent Worker, stores the client token in ElevenLabs as a workspace secret,
-   and prints the voice agent's id.
-3. Set `IRIS_CALL_HISTORY_KEY` (the key, secret), `IRIS_CALL_AGENT_ID` (the id) and `IRIS_CALL_BROWSER=on`, then
-   redeploy.
+   prints the voice agent's id, and sets the console's `IRIS_CALL_HISTORY_KEY` (the key, secret), `IRIS_CALL_AGENT_ID`
+   and `IRIS_CALL_BROWSER=on` on Vercel (production).
+3. Redeploy the console.
 
 The voice agent is private: only this app's server can open a call (a one-time token), for a signed-in person who may
 use Iris. Each call carries a pass signed for that person (30 minutes), so the agent answers for them alone, and
